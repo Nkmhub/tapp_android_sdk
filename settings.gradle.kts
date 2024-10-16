@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "tapp"
 include(":app")
 include(":tappRefEngineSDK")
+
