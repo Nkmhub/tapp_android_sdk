@@ -1,7 +1,7 @@
-package com.example.wre_ref_engine_sdk.Services.Network
+package com.example.tapprefenginesdk.services.network
 
-import com.example.wre_ref_engine_sdk.Models.Affiliate
-import com.example.wre_ref_engine_sdk.Models.AffiliateUrlResponse
+import com.example.tapprefenginesdk.models.Affiliate
+import com.example.tapprefenginesdk.models.AffiliateUrlResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject

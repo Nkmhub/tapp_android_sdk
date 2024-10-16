@@ -1,4 +1,4 @@
-package com.example.wre_ref_engine_sdk.Models
+package com.example.tapprefenginesdk.models
 
 enum class AdjustEnv {
     production,

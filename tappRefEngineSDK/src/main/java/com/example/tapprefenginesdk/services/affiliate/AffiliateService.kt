@@ -1,7 +1,7 @@
-package com.example.wre_ref_engine_sdk.Services.Affiliate
+package com.example.tapprefenginesdk.services.affiliate
 
 import android.content.Context
-import com.example.wre_ref_engine_sdk.Models.AdjustEnv
+import com.example.tapprefenginesdk.models.AdjustEnv
 
 interface AffiliateService {
     fun processReferral(

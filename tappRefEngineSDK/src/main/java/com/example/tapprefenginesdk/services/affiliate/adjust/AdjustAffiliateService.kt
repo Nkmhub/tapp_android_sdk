@@ -6,8 +6,8 @@ import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustConfig
 import com.adjust.sdk.AdjustDeeplink
 import com.adjust.sdk.LogLevel
-import com.example.wre_ref_engine_sdk.Models.AdjustEnv
-import com.example.wre_ref_engine_sdk.Services.Affiliate.AffiliateService
+import com.example.tapprefenginesdk.models.AdjustEnv
+import com.example.tapprefenginesdk.services.affiliate.AffiliateService
 
 class AdjustAffiliateService : AffiliateService {
 

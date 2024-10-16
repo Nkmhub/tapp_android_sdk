@@ -1,8 +1,8 @@
 package com.example.wre_ref_engine_sdk.Services.Affiliate.AppFlyer
 
 import android.content.Context
-import com.example.wre_ref_engine_sdk.Models.AdjustEnv
-import com.example.wre_ref_engine_sdk.Services.Affiliate.AffiliateService
+import com.example.tapprefenginesdk.models.AdjustEnv
+import com.example.tapprefenginesdk.services.affiliate.AffiliateService
 
 class AppsflyerAffiliateService : AffiliateService {
     override fun processReferral(

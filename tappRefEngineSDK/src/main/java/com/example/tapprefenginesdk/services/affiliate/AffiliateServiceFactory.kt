@@ -1,6 +1,7 @@
-package com.example.wre_ref_engine_sdk.Services.Affiliate
+package com.example.tapprefenginesdk.services.affiliate
 
-import com.example.wre_ref_engine_sdk.Models.Affiliate
+import com.example.tapprefenginesdk.models.Affiliate
+import com.example.tapprefenginesdk.services.affiliate.AffiliateService
 import com.example.wre_ref_engine_sdk.Services.Affiliate.Adjust.AdjustAffiliateService
 import com.example.wre_ref_engine_sdk.Services.Affiliate.AppFlyer.AppsflyerAffiliateService
 

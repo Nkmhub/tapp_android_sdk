@@ -1,4 +1,4 @@
-package com.example.wre_ref_engine_sdk.Models
+package com.example.tapprefenginesdk.models
 
 sealed class ReferralEngineError(message: String) : Exception(message) {
     class NetworkError(message: String) : ReferralEngineError(message)

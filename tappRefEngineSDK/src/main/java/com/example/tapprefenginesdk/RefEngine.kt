@@ -1,12 +1,11 @@
-package com.example.wre_ref_engine_sdk
+package com.example.tapprefenginesdk
 
 import android.content.Context
-import com.example.wre_ref_engine_sdk.Models.Affiliate
-import com.example.wre_ref_engine_sdk.Models.AdjustEnv
-import com.example.wre_ref_engine_sdk.Models.AffiliateUrlResponse
-import com.example.wre_ref_engine_sdk.Services.Affiliate.AffiliateServiceFactory
-import com.example.wre_ref_engine_sdk.Services.Network.NetworkManager
-import com.example.wre_ref_engine_sdk.Models.ReferralEngineError
+import com.example.tapprefenginesdk.models.Affiliate
+import com.example.tapprefenginesdk.models.AdjustEnv
+import com.example.tapprefenginesdk.models.AffiliateUrlResponse
+import com.example.tapprefenginesdk.services.affiliate.AffiliateServiceFactory
+import com.example.tapprefenginesdk.services.network.NetworkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
