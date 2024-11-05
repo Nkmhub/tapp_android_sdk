@@ -1,6 +1,6 @@
 package com.example.tapprefenginesdk.models
 
-enum class AdjustEnv {
+enum class Environment {
     production,
     sandbox
 }
