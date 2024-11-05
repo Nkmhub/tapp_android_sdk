@@ -33,6 +33,10 @@ class RefEngine(context: Context) {
         deepLink: String,
         affiliate: Affiliate,
     ) {
+        println("environment: $environment")
+        println("appToken: $appToken")
+        println("tappToken: $tappToken")
+
         val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
         val isFirstTime = sharedPreferences.getBoolean("isFirstTimeReferral", true)
 
