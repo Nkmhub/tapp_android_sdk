@@ -18,8 +18,11 @@ class NetworkManager {
         headers: Map<String, String>
     ): Result<JSONObject> = withContext(Dispatchers.IO) {
         return@withContext try {
+            println("Starting postRequest...")  // Start of the method
+
             // Create the URL object
             val connectionUrl = URL(url)
+            println("URL: $url")  // Debug the URL
 
             // Open a connection
             val connection = connectionUrl.openConnection() as HttpURLConnection
@@ -29,21 +32,35 @@ class NetworkManager {
             headers.forEach { (key, value) ->
                 connection.setRequestProperty(key, value)
             }
-            connection.setRequestProperty("Content-Type", "application/json")
+            println("Headers: $headers")  // Debug the headers
+
             connection.doOutput = true
             connection.doInput = true
 
             // Prepare the JSON request body
             val requestBody = JSONObject(params).toString()
+            println("Request Body: $requestBody")  // Debug the request body
+
+            // Build the cURL command
+            val curlCommand = buildString {
+                append("curl -X POST \"$url\"")
+                headers.forEach { (key, value) ->
+                    append(" -H \"$key: $value\"")
+                }
+                append(" -d '$requestBody'")
+            }
+            println("Generated cURL Command: $curlCommand")
 
             // Write the request body to the output stream
             OutputStreamWriter(connection.outputStream).use { writer ->
                 writer.write(requestBody)
                 writer.flush()
             }
+            println("Request sent, waiting for response...")  // After sending the request
 
             // Get the response code
             val responseCode = connection.responseCode
+            println("Response Code: $responseCode")  // Debug the response code
 
             // Read the response
             val responseText = if (responseCode in 200..299) {
@@ -53,18 +70,21 @@ class NetworkManager {
             }
 
             // Print raw response for debugging
-            println("Raw response data: $responseText")
+            println("Raw Response Data: $responseText")  // Debug the raw response
 
             // Parse the JSON response
             val jsonResponse = JSONObject(responseText)
+            println("Parsed JSON Response: $jsonResponse")  // Debug the parsed JSON response
 
             // Return the parsed JSON object as a successful result
             Result.success(jsonResponse)
 
         } catch (e: Exception) {
             // Handle any exceptions and return a failure result
+            println("Error in postRequest: ${e.localizedMessage}")
             e.printStackTrace()
             Result.failure(e)
         }
     }
+
 }

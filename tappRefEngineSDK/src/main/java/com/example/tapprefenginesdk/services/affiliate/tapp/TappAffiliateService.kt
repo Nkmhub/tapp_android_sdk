@@ -73,10 +73,6 @@ class TappAffiliateService: AffiliateService {
         val apiUrl = "${baseAPIURL}generateUrl"
 
         println("Starting generateAffiliateUrl...")
-        println("API URL: $apiUrl")
-        println("Token: $token")
-        println("Request Params - wreToken: $wreToken, influencer: $influencer, adgroup: $adgroup, creative: $creative, mmp: $mmp")
-        println("Data JSON Object: $jsonObject")
 
         // Prepare the request body
         val requestBody = mapOf(
@@ -87,14 +83,12 @@ class TappAffiliateService: AffiliateService {
             "creative" to creative,
             "data" to JSONObject(jsonObject).toString()
         )
-        println("Request Body: $requestBody")
 
         // Set headers
         val headers = mapOf(
             "Authorization" to "Bearer $token",
             "Content-Type" to "application/json"
         )
-        println("Headers: $headers")
 
         // Make the network request and handle the result
         try {
