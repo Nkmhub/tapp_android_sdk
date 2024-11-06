@@ -74,14 +74,14 @@ class TappAffiliateService: AffiliateService {
 
         println("Starting generateAffiliateUrl...")
 
-        // Prepare the request body
+        // Prepare the request body with nested JSON for "data"
         val requestBody = mapOf(
             "wre_token" to wreToken,
             "mmp" to mmp.toString(),
             "influencer" to influencer,
             "adgroup" to adgroup,
             "creative" to creative,
-            "data" to JSONObject(jsonObject).toString()
+            "data" to jsonObject // Pass as a Map directly for nested JSON
         )
 
         // Set headers
@@ -130,6 +130,7 @@ class TappAffiliateService: AffiliateService {
             )
         }
     }
+
 
 
 
