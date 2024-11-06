@@ -40,10 +40,9 @@ class NetworkManager {
             // Prepare the JSON request body
             val jsonParams = JSONObject().apply {
                 params.forEach { (key, value) ->
-                    if (value is Map<*, *>) {
-                        put(key, JSONObject(value))
-                    } else {
-                        put(key, value)
+                    when (value) {
+                        is Map<*, *> -> put(key, JSONObject(value as Map<String, Any>))
+                        else -> put(key, value)
                     }
                 }
             }
@@ -93,6 +92,7 @@ class NetworkManager {
             Result.failure(e)
         }
     }
+
 
 
 
