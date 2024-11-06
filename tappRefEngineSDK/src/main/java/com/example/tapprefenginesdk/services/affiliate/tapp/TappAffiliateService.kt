@@ -72,6 +72,12 @@ class TappAffiliateService: AffiliateService {
     ): AffiliateUrlResponse = withContext(Dispatchers.IO) {
         val apiUrl = "${baseAPIURL}generateUrl"
 
+        println("Starting generateAffiliateUrl...")
+        println("API URL: $apiUrl")
+        println("Token: $token")
+        println("Request Params - wreToken: $wreToken, influencer: $influencer, adgroup: $adgroup, creative: $creative, mmp: $mmp")
+        println("Data JSON Object: $jsonObject")
+
         // Prepare the request body
         val requestBody = mapOf(
             "wre_token" to wreToken,
@@ -81,36 +87,56 @@ class TappAffiliateService: AffiliateService {
             "creative" to creative,
             "data" to JSONObject(jsonObject).toString()
         )
+        println("Request Body: $requestBody")
 
         // Set headers
         val headers = mapOf(
             "Authorization" to "Bearer $token",
             "Content-Type" to "application/json"
         )
+        println("Headers: $headers")
 
         // Make the network request and handle the result
-        val result = networkManager.postRequest(apiUrl, requestBody, headers)
+        try {
+            val result = networkManager.postRequest(apiUrl, requestBody, headers)
 
-        result.fold(
-            onSuccess = { jsonResponse ->
-                val error = jsonResponse.optBoolean("error", true)
-                val message = jsonResponse.optString("message", "Unknown error")
-                val affiliateUrl = jsonResponse.optString("influencer_url", "")
+            result.fold(
+                onSuccess = { jsonResponse ->
+                    println("Successfully received response from networkManager.postRequest")
+                    println("Raw JSON Response: $jsonResponse")
 
-                AffiliateUrlResponse(
-                    error = error,
-                    message = message,
-                    influencer_url = affiliateUrl
-                )
-            },
-            onFailure = { exception ->
-                AffiliateUrlResponse(
-                    error = true,
-                    message = "Exception occurred: ${exception.localizedMessage}",
-                    influencer_url = ""
-                )
-            }
-        )
+                    val error = jsonResponse.optBoolean("error", true)
+                    val message = jsonResponse.optString("message", "Unknown error")
+                    val affiliateUrl = jsonResponse.optString("influencer_url", "")
+
+                    println("Parsed Response - Error: $error, Message: $message, Affiliate URL: $affiliateUrl")
+
+                    AffiliateUrlResponse(
+                        error = error,
+                        message = message,
+                        influencer_url = affiliateUrl
+                    )
+                },
+                onFailure = { exception ->
+                    println("Error in network request: ${exception.localizedMessage}")
+                    AffiliateUrlResponse(
+                        error = true,
+                        message = "Exception occurred: ${exception.localizedMessage}",
+                        influencer_url = ""
+                    )
+                }
+            )
+        } catch (e: Exception) {
+            // If the response is HTML or unexpected, log it for debugging
+            println("Failed to parse response as JSON. Raw response: ${e.localizedMessage}")
+            AffiliateUrlResponse(
+                error = true,
+                message = "Failed to parse response as JSON or unexpected response",
+                influencer_url = ""
+            )
+        }
     }
+
+
 
 }
