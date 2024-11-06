@@ -73,7 +73,7 @@ class RefEngine(context: Context) {
             adgroup = adgroup,
             creative = creative,
             mmp = mmp,
-            token = appToken,
+            token = tappToken,
             jsonObject = jsonObject
         ) ?: AffiliateUrlResponse(
             error = true,
