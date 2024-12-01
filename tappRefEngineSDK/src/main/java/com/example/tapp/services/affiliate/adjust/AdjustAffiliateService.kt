@@ -33,8 +33,8 @@ class AdjustAffiliateService(private val dependencies: Dependencies) : Affiliate
             Logger.logInfo("Handling initialize Adjust")
 
             val adjustEnvironment = when (config.env) {
-                Environment.production.toString() -> AdjustConfig.ENVIRONMENT_PRODUCTION
-                Environment.sandbox.toString() -> AdjustConfig.ENVIRONMENT_SANDBOX
+                Environment.production -> AdjustConfig.ENVIRONMENT_PRODUCTION
+                Environment.sandbox-> AdjustConfig.ENVIRONMENT_SANDBOX
                 else -> {
                     Logger.logWarning("Error: Missing required param Environment")
                     return false

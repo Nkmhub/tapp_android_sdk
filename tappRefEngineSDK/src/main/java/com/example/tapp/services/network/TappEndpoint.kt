@@ -22,7 +22,7 @@ object TappEndpoint {
         val config = dependencies.keystoreUtils.getConfig()
             ?: throw TappError.MissingConfiguration("Missing configuration in keystore")
 
-        val url = "${getBaseUrl(config.env)}deeplink"
+        val url = "${getBaseUrl(config.env.environmentName())}deeplink"
         val headers = mapOf(
             "Content-Type" to "application/json",
             "Authorization" to "Bearer ${config.authToken}"
@@ -41,7 +41,7 @@ object TappEndpoint {
         val config = dependencies.keystoreUtils.getConfig()
             ?: throw TappError.MissingConfiguration("Missing configuration in keystore")
 
-        val url = "${getBaseUrl(config.env)}secrets"
+        val url = "${getBaseUrl(config.env.environmentName())}secrets"
         val headers = mapOf(
             "Content-Type" to "application/json",
             "Authorization" to "Bearer ${config.authToken}"
@@ -60,7 +60,7 @@ object TappEndpoint {
         val config = dependencies.keystoreUtils.getConfig()
             ?: throw TappError.MissingConfiguration("Configuration is missing")
 
-        val url = "${getBaseUrl(config.env)}influencer/add"
+        val url = "${getBaseUrl(config.env.environmentName())}influencer/add"
 
         val headers = mapOf(
             "Authorization" to "Bearer ${request.authToken}",
@@ -87,7 +87,7 @@ object TappEndpoint {
         val config = dependencies.keystoreUtils.getConfig()
             ?: throw TappError.MissingConfiguration("Configuration is missing")
 
-        val url = "${getBaseUrl(config.env)}/event"
+        val url = "${getBaseUrl(config.env.environmentName())}/event"
         val headers = mapOf(
             "Content-Type" to "application/json",
             "Authorization" to "Bearer ${config.authToken}"
