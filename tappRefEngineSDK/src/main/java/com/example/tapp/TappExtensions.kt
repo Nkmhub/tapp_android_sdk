@@ -97,7 +97,7 @@ internal fun Tapp.secrets(config: TappConfiguration, completion: (Result<Unit>) 
         return
     }
 
-    if (storedConfig.getAppToken() != null) {
+    if (storedConfig.appToken != null) {
         completion(Result.success(Unit))
         return
     }
@@ -108,7 +108,7 @@ internal fun Tapp.secrets(config: TappConfiguration, completion: (Result<Unit>) 
         tappService.fetchSecrets() { result: Result<RequestModels.SecretsResponse> ->
             result.fold(
                 onSuccess = { response ->
-                    storedConfig.setAppToken(response.secret)
+                    storedConfig.appToken = response.secret
                     dependencies.keystoreUtils.saveConfig(storedConfig)
                     completion(Result.success(Unit))
                 },
@@ -152,12 +152,13 @@ internal fun Tapp.initializeAffiliateService(completion: VoidCompletion?) {
 internal fun Tapp.setProcessedReferralEngine() {
     val storedConfig = dependencies.keystoreUtils.getConfig()
     storedConfig?.let {
-        it.setReferralEngineProcessed(true) // Use setter
+        it.hasProcessedReferralEngine = true // Directly set the property
         dependencies.keystoreUtils.saveConfig(it)
     }
 }
 
 internal fun Tapp.hasProcessedReferralEngine(): Boolean {
-    return dependencies.keystoreUtils.getConfig()?.isReferralEngineProcessed()
-        ?: false // Use getter
+    return dependencies.keystoreUtils.getConfig()?.hasProcessedReferralEngine
+        ?: false // Directly access the property
 }
+

@@ -42,7 +42,7 @@ class AdjustAffiliateService(private val dependencies: Dependencies) : Affiliate
             }
 
 
-            val adjustConfig = AdjustConfig(context, config.getAppToken(), adjustEnvironment)
+            val adjustConfig = AdjustConfig(context, config.appToken, adjustEnvironment)
             adjustConfig.setLogLevel(LogLevel.VERBOSE)
             Adjust.initSdk(adjustConfig)
             true

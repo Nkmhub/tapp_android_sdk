@@ -15,23 +15,23 @@ data class TappConfiguration(
     var hasProcessedReferralEngine: Boolean = false,
     val androidId: String? = null
 ) {
-    fun setAppToken(appToken: String) {
-        this.appToken = appToken
-    }
-
-    fun getAppToken(): String? {
-        return appToken
-    }
-
-    // Getter for hasProcessedReferralEngine
-    fun isReferralEngineProcessed(): Boolean {
-        return hasProcessedReferralEngine
-    }
-
-    // Setter for hasProcessedReferralEngine
-    fun setReferralEngineProcessed(value: Boolean) {
-        hasProcessedReferralEngine = value
-    }
+//    fun setAppToken(appToken: String) {
+//        this.appToken = appToken
+//    }
+//
+//    fun getAppToken(): String? {
+//        return appToken
+//    }
+//
+//    // Getter for hasProcessedReferralEngine
+//    fun isReferralEngineProcessed(): Boolean {
+//        return hasProcessedReferralEngine
+//    }
+//
+//    // Setter for hasProcessedReferralEngine
+//    fun setReferralEngineProcessed(value: Boolean) {
+//        hasProcessedReferralEngine = value
+//    }
 
 
     override fun equals(other: Any?): Boolean {

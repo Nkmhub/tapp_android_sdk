@@ -93,8 +93,8 @@ class Tapp(context: Context) {
         Logger.logInfo("Affiliate: ${storedConfig.affiliate}")
         Logger.logInfo("Bundle ID: ${storedConfig.bundleID ?: "Not Set"}")
         Logger.logInfo("Android ID: ${storedConfig.androidId ?: "Not Set"}")
-        Logger.logInfo("App Token: ${storedConfig.getAppToken() ?: "Not Set"}")
-        Logger.logInfo("Referral Engine Processed: ${storedConfig.isReferralEngineProcessed()}")
+        Logger.logInfo("App Token: ${storedConfig.appToken ?: "Not Set"}")
+        Logger.logInfo("Referral Engine Processed: ${storedConfig.hasProcessedReferralEngine}")
     }
 
 
