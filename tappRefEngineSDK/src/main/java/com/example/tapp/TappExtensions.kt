@@ -4,6 +4,7 @@ import com.example.tapp.models.Affiliate
 import com.example.tapp.services.affiliate.tapp.TappAffiliateService
 import com.example.tapp.services.network.RequestModels
 import com.example.tapp.services.network.TappError
+import com.example.tapp.utils.Logger
 import com.example.tapp.utils.TappConfiguration
 import com.example.tapp.utils.VoidCompletion
 
@@ -68,6 +69,7 @@ internal fun Tapp.handleReferralCallback(
 
 internal fun Tapp.fetchSecretsAndInitializeReferralEngineIfNeeded(completion: VoidCompletion?) {
     val config = dependencies.keystoreUtils.getConfig()
+    Logger.logInfo("start fetchSecretsAndInitializeReferralEngineIfNeeded $config")
     if (config == null) {
         completion?.invoke(Result.failure(TappError.MissingConfiguration()))
         return
@@ -88,6 +90,7 @@ internal fun Tapp.fetchSecretsAndInitializeReferralEngineIfNeeded(completion: Vo
 }
 
 internal fun Tapp.secrets(config: TappConfiguration, completion: (Result<Unit>) -> Unit) {
+    Logger.logInfo("start secret service")
     val storedConfig = dependencies.keystoreUtils.getConfig()
     if (storedConfig == null) {
         completion(Result.failure(TappError.MissingConfiguration()))

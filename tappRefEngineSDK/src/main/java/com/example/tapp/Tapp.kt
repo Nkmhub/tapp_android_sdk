@@ -19,18 +19,25 @@ class Tapp(context: Context) {
 
     internal val dependencies = Dependencies.live(context)
     fun start(config: TappConfiguration) {
+        Logger.logInfo("Start config")
         val androidId = Settings.Secure.getString(
             dependencies.context.contentResolver,
             Settings.Secure.ANDROID_ID
         )
+        Logger.logInfo("Android_id saved, $androidId")
+
+        Logger.logInfo("Get bundle id")
         val updatedConfig = config.copy(
             bundleID = config.bundleID ?: dependencies.context.packageName,
             androidId = config.androidId ?: androidId
         )
-
+        Logger.logInfo("updatedConfig $updatedConfig")
         val storedConfig = dependencies.keystoreUtils.getConfig()
-        if (storedConfig != null && storedConfig != updatedConfig) {
+        if (storedConfig == null || storedConfig != updatedConfig) {
             dependencies.keystoreUtils.saveConfig(updatedConfig)
+            Logger.logInfo("Configuration saved: $updatedConfig")
+        } else {
+            Logger.logInfo("Configuration already exists: $storedConfig")
         }
 
         CoroutineScope(Dispatchers.Main).launch {
@@ -46,6 +53,7 @@ class Tapp(context: Context) {
             }
         }
     }
+
 
 
     fun appWillOpen(url: String, completion: VoidCompletion?) {
