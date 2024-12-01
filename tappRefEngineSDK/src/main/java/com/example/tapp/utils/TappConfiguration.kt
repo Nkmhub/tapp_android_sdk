@@ -4,7 +4,7 @@ import com.example.tapp.models.Affiliate
 import com.example.tapp.models.Environment
 import kotlinx.serialization.Serializable
 
-//@Serializable
+@Serializable
 data class TappConfiguration(
     val authToken: String,
     val env: Environment,
