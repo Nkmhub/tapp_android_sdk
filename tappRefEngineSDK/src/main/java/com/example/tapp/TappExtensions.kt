@@ -90,7 +90,7 @@ internal fun Tapp.fetchSecretsAndInitializeReferralEngineIfNeeded(completion: Vo
 }
 
 internal fun Tapp.secrets(config: TappConfiguration, completion: (Result<Unit>) -> Unit) {
-    Logger.logInfo("start secret service")
+    Logger.logInfo("start secret service!")
     val storedConfig = dependencies.keystoreUtils.getConfig()
     if (storedConfig == null) {
         completion(Result.failure(TappError.MissingConfiguration()))
