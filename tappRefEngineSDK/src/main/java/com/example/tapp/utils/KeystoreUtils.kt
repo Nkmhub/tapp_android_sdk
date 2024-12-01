@@ -98,19 +98,29 @@ class KeystoreUtils(context: Context) {
 
     private fun encrypt(value: String): String {
         return try {
+            Logger.logInfo("Starting encryption for value: ${value.take(100)}... (truncated for log)")
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            Logger.logInfo("Cipher initialized successfully")
+
             cipher.init(Cipher.ENCRYPT_MODE, getSecretKey())
             val iv = cipher.iv
+            Logger.logInfo("Generated IV: ${Base64.encodeToString(iv, Base64.DEFAULT)}")
+
             val encryptedData = cipher.doFinal(value.toByteArray(Charsets.UTF_8))
+            Logger.logInfo("Encrypted data length: ${encryptedData.size}")
 
             val ivBase64 = Base64.encodeToString(iv, Base64.DEFAULT)
             val encryptedBase64 = Base64.encodeToString(encryptedData, Base64.DEFAULT)
-            "$ivBase64:$encryptedBase64"
+
+            "$ivBase64:$encryptedBase64".also {
+                Logger.logInfo("Encryption complete. Encrypted config size: ${it.length}")
+            }
         } catch (e: Exception) {
             Logger.logError("Encryption failed: ${e.localizedMessage}")
-            throw e
+            throw IllegalStateException("Failed to encrypt value. Cause: ${e.localizedMessage}", e)
         }
     }
+
 
     private fun decrypt(encryptedValue: String): String {
         return try {
