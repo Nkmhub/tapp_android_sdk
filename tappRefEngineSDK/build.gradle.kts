@@ -41,10 +41,12 @@ dependencies {
     api("com.adjust.sdk:adjust-android:5.0.0")
     api("com.android.installreferrer:installreferrer:2.2")
     api("com.adjust.sdk:adjust-android-webbridge:5.0.0")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
 }
 
 publishing {

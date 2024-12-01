@@ -1,4 +1,4 @@
-package com.example.tapprefenginesdk.models
+package com.example.tapp.models
 
 enum class Environment {
     production,

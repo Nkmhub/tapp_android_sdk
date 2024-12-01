@@ -1,4 +1,4 @@
-package com.example.tapprefenginesdk.models
+package com.example.tapp.models
 
 sealed class ReferralEngineError(message: String) : Exception(message) {
     class NetworkError(message: String) : ReferralEngineError(message)

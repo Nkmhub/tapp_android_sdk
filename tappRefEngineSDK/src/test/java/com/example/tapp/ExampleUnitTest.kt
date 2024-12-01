@@ -1,4 +1,4 @@
-package com.example.tapprefenginesdk
+package com.example.tapp
 
 import org.junit.Test
 
