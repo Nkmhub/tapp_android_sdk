@@ -2,7 +2,7 @@ package com.example.tapp.models
 
 import kotlinx.serialization.Serializable
 
-@Serializable
+//@Serializable
 enum class Affiliate {
     ADJUST,
     APPFLYER,

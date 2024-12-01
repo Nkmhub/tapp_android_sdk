@@ -56,6 +56,7 @@ class KeystoreUtils(context: Context) {
     }
 
     fun saveConfig(config: TappConfiguration) {
+        Logger.logInfo("Start saving config: $config")
         val jsonConfig = Json.encodeToString(config)
         Logger.logInfo("Saving config: $jsonConfig")
         try {

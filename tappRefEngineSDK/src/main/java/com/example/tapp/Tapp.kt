@@ -34,6 +34,7 @@ class Tapp(context: Context) {
         Logger.logInfo("updatedConfig $updatedConfig")
         val storedConfig = dependencies.keystoreUtils.getConfig()
         if (storedConfig == null || storedConfig != updatedConfig) {
+            Logger.logInfo("Trying to save the config")
             dependencies.keystoreUtils.saveConfig(updatedConfig)
             Logger.logInfo("Configuration saved: $updatedConfig")
         } else {
