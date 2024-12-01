@@ -1,8 +1,7 @@
-package com.example.tapprefenginesdk.config
+package com.example.tapp.config
 
 import android.content.Context
-import com.example.tapprefenginesdk.models.Environment
-import com.example.tapprefenginesdk.R
+import com.example.tapp.models.Environment
 
 class ConfigManager(private val context: Context) {
 
