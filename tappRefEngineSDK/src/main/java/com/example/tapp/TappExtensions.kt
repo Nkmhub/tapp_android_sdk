@@ -122,10 +122,17 @@ internal fun Tapp.secrets(completion: (Result<Unit>) -> Unit) {
 
 
 internal fun Tapp.initializeAffiliateService(completion: VoidCompletion?) {
+    val config = dependencies.keystoreUtils.getConfig()
+    if (config == null) {
+        completion?.invoke(Result.failure(TappError.MissingConfiguration()))
+        return
+    }
+
     val affiliateService = dependencies.affiliateServiceFactory.getAffiliateService(
-        dependencies.keystoreUtils.getConfig()?.affiliate ?: Affiliate.TAPP,
+        config.affiliate,
         dependencies
     )
+
     if (affiliateService == null) {
         completion?.invoke(Result.failure(TappError.MissingAffiliateService("Affiliate service not available")))
         return
@@ -152,7 +159,6 @@ internal fun Tapp.initializeAffiliateService(completion: VoidCompletion?) {
         )
     }
 }
-
 
 
 internal fun Tapp.setProcessedReferralEngine() {

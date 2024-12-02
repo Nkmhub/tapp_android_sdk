@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-class TappAffiliateService(private val dependencies: Dependencies) : AffiliateService {
+internal class TappAffiliateService(private val dependencies: Dependencies) : AffiliateService {
     private var isTapEnabled: Boolean = true // Default value
 
     override fun initialize(): Boolean {

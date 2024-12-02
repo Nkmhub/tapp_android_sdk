@@ -6,6 +6,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -13,7 +14,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-class KeystoreUtils(context: Context) {
+internal class KeystoreUtils(context: Context) {
 
     private val keyAlias = "tapp_c"
     private val keyStore: KeyStore = KeyStore.getInstance("AndroidKeyStore")
@@ -46,13 +47,12 @@ class KeystoreUtils(context: Context) {
                 )
                     .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                    .setUserAuthenticationRequired(false) // Set to true for biometric auth if needed
+                    .setUserAuthenticationRequired(false)
                     .build()
 
                 keyGenerator.init(keyGenParameterSpec)
                 keyGenerator.generateKey()
             } else {
-                // Handle key generation for API levels below 23 if needed
                 throw UnsupportedOperationException("Key generation is not supported on this Android version.")
             }
         } catch (e: Exception) {
@@ -62,9 +62,9 @@ class KeystoreUtils(context: Context) {
     }
 
     @Synchronized
-    fun saveConfig(config: TappConfiguration) {
+    internal fun saveConfig(config: InternalConfiguration) {
         val jsonConfig = json.encodeToString(config)
-        Logger.logInfo("Saving config.")
+        Logger.logInfo("Saving internal configuration.")
         try {
             val encryptedConfig = encrypt(jsonConfig)
             val success = sharedPreferences.edit().putString("tapp_config", encryptedConfig).commit()
@@ -75,24 +75,23 @@ class KeystoreUtils(context: Context) {
             }
         } catch (e: Exception) {
             Logger.logError("Failed to save configuration: ${e.localizedMessage}")
-            // Optionally re-throw if you want the calling code to handle it
             throw e
         }
     }
 
     @Synchronized
-    fun getConfig(): TappConfiguration? {
+    internal fun getConfig(): InternalConfiguration? {
         val encryptedConfig = sharedPreferences.getString("tapp_config", null)
         if (encryptedConfig == null) {
             Logger.logInfo("No configuration found in SharedPreferences.")
             return null
         } else {
-            Logger.logInfo("Encrypted configuration retrieved: $encryptedConfig")
+            Logger.logInfo("Encrypted configuration retrieved.")
         }
 
         return try {
             val decryptedConfig = decrypt(encryptedConfig)
-            json.decodeFromString(decryptedConfig)
+            json.decodeFromString<InternalConfiguration>(decryptedConfig)
         } catch (e: Exception) {
             Logger.logError("Failed to decrypt configuration: ${e.localizedMessage}")
             null
@@ -100,7 +99,7 @@ class KeystoreUtils(context: Context) {
     }
 
     @Synchronized
-    fun clearConfig() {
+    internal fun clearConfig() {
         val success = sharedPreferences.edit().remove("tapp_config").commit()
         if (success) {
             Logger.logInfo("Configuration cleared.")
@@ -109,7 +108,7 @@ class KeystoreUtils(context: Context) {
         }
     }
 
-    fun hasConfig(): Boolean {
+    internal fun hasConfig(): Boolean {
         val hasConfig = sharedPreferences.contains("tapp_config")
         Logger.logInfo("Configuration exists: $hasConfig")
         return hasConfig
@@ -157,5 +156,3 @@ class KeystoreUtils(context: Context) {
         return (keyStore.getEntry(keyAlias, null) as KeyStore.SecretKeyEntry).secretKey
     }
 }
-
-

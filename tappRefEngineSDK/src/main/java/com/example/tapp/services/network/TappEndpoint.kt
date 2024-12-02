@@ -4,7 +4,7 @@ import android.net.Uri
 import com.example.tapp.dependencies.Dependencies
 import com.example.tapp.models.Environment
 
-object TappEndpoint {
+internal object TappEndpoint {
     private fun getBaseUrl(env: String): String {
         val environment = try {
             Environment.valueOf(env.uppercase())

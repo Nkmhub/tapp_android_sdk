@@ -15,31 +15,42 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.provider.Settings
+import com.example.tapp.utils.InternalConfiguration
 
 class Tapp(context: Context) {
 
     internal val dependencies = Dependencies.live(context)
+
     fun start(config: TappConfiguration) {
         Logger.logInfo("Start config")
+
         val androidId = Settings.Secure.getString(
             dependencies.context.contentResolver,
             Settings.Secure.ANDROID_ID
         )
-        Logger.logInfo("Android_id saved, $androidId")
+        Logger.logInfo("Android ID retrieved: $androidId")
 
-        Logger.logInfo("Get bundle id")
-        val updatedConfig = config.copy(
-            bundleID = config.bundleID ?: dependencies.context.packageName,
-            androidId = config.androidId ?: androidId
+        val bundleID = dependencies.context.packageName
+        Logger.logInfo("Bundle ID: $bundleID")
+
+        val internalConfig = InternalConfiguration(
+            authToken = config.authToken,
+            env = config.env,
+            tappToken = config.tappToken,
+            affiliate = config.affiliate,
+            bundleID = bundleID,
+            androidId = androidId
         )
-        Logger.logInfo("updatedConfig $updatedConfig")
+
+        Logger.logInfo("InternalConfig: $internalConfig")
+
         val storedConfig = dependencies.keystoreUtils.getConfig()
-        if (storedConfig == null || storedConfig != updatedConfig) {
-            Logger.logInfo("Trying to save the config")
-            dependencies.keystoreUtils.saveConfig(updatedConfig)
-            Logger.logInfo("Configuration saved: $updatedConfig")
+        if (storedConfig == null || storedConfig != internalConfig) {
+            Logger.logInfo("Saving new configuration")
+            dependencies.keystoreUtils.saveConfig(internalConfig)
+            Logger.logInfo("Configuration saved")
         } else {
-            Logger.logInfo("Configuration already exists: $storedConfig")
+            Logger.logInfo("Configuration already exists")
         }
 
         CoroutineScope(Dispatchers.Main).launch {

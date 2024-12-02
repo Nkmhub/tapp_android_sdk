@@ -5,7 +5,7 @@ import com.example.tapp.services.network.NetworkManager
 import com.example.tapp.services.affiliate.AffiliateServiceFactory
 import com.example.tapp.utils.KeystoreUtils
 
-class Dependencies private constructor(
+internal class Dependencies private constructor(
     val context: Context,
     val keystoreUtils: KeystoreUtils,
     val networkManager: NetworkManager,
