@@ -16,8 +16,8 @@ class ConfigManager(private val context: Context) {
     fun getEnvironment(): Environment {
         val environmentStr = context.getString(context.resources.getIdentifier("ENVIRONMENT", "string", context.packageName))
         return when (environmentStr.lowercase()) {
-            "production" -> Environment.production
-            "sandbox" -> Environment.sandbox
+            "PRODUCTION" -> Environment.PRODUCTION
+            "SANDBOX" -> Environment.SANDBOX
             else -> throw IllegalArgumentException("Invalid environment value in tapp_config.xml: $environmentStr")
         }
     }

@@ -6,14 +6,15 @@ import com.example.tapp.models.Environment
 object TappEndpoint {
     private fun getBaseUrl(env: String): String {
         val environment = try {
-            Environment.valueOf(env.lowercase().replaceFirstChar { it.uppercaseChar() }) // Maps "sandbox" or "production" to the enum
+            Environment.valueOf(env.uppercase())
         } catch (e: IllegalArgumentException) {
             throw TappError.MissingConfiguration("Invalid environment value: $env")
         }
 
         return when (environment) {
-            Environment.production -> "https://api.nkmhub.com/v1/ref/"
-            Environment.sandbox -> "https://api.nkmhub.com/v2/ref/"
+            Environment.PRODUCTION -> "https://api.nkmhub.com/v1/ref/"
+            //TODO:: REPLACE WITH ACTUAL SANDBOX URL
+            Environment.SANDBOX -> "https://api.nkmhub.com/v1/ref/"
         }
     }
 

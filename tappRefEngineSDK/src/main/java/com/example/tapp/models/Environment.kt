@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class Environment {
-    production,
-    sandbox;
+    PRODUCTION,
+    SANDBOX;
 
     fun environmentName(): String {
         return name
