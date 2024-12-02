@@ -49,7 +49,7 @@ object TappEndpoint {
         )
         val body = mapOf(
             "tapp_token" to config.tappToken,
-            "bundleID" to (config.bundleID?:""),
+            "bundle_id" to (config.bundleID?:""),
             "mmp" to config.affiliate.toIntValue()
         )
 
