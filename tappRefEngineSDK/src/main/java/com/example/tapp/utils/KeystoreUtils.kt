@@ -29,6 +29,7 @@ class KeystoreUtils(context: Context) {
             }
         } catch (e: Exception) {
             Logger.logError("Keystore initialization failed: ${e.localizedMessage}")
+            throw IllegalStateException("Keystore initialization failed.", e)
         }
     }
 
@@ -45,33 +46,43 @@ class KeystoreUtils(context: Context) {
                 )
                     .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                    .setUserAuthenticationRequired(false) // Set true for biometric auth if needed
+                    .setUserAuthenticationRequired(false) // Set to true for biometric auth if needed
                     .build()
 
                 keyGenerator.init(keyGenParameterSpec)
                 keyGenerator.generateKey()
+            } else {
+                // Handle key generation for API levels below 23 if needed
+                throw UnsupportedOperationException("Key generation is not supported on this Android version.")
             }
         } catch (e: Exception) {
             Logger.logError("Failed to create key: ${e.localizedMessage}")
+            throw IllegalStateException("Failed to create encryption key.", e)
+        }
+    }
+
+    @Synchronized
+    fun saveConfig(config: TappConfiguration) {
+        val jsonConfig = json.encodeToString(config)
+        Logger.logInfo("Saving config.")
+        try {
+            val encryptedConfig = encrypt(jsonConfig)
+            val success = sharedPreferences.edit().putString("tapp_config", encryptedConfig).commit()
+            if (!success) {
+                Logger.logError("Failed to commit configuration to SharedPreferences.")
+            }
+        } catch (e: Exception) {
+            Logger.logError("Failed to save configuration: ${e.localizedMessage}")
+            // Optionally re-throw if you want the calling code to handle it
             throw e
         }
     }
 
-    fun saveConfig(config: TappConfiguration) {
-        val jsonConfig = json.encodeToString(config)
-        Logger.logInfo("Saving config: $jsonConfig")
-        try {
-            val encryptedConfig = encrypt(jsonConfig)
-            sharedPreferences.edit().putString("tapp_config", encryptedConfig).apply()
-        } catch (e: Exception) {
-            Logger.logError("Failed to save configuration: ${e.localizedMessage}")
-        }
-    }
-
+    @Synchronized
     fun getConfig(): TappConfiguration? {
         val encryptedConfig = sharedPreferences.getString("tapp_config", null)
         if (encryptedConfig == null) {
-            Logger.logError("No configuration found.")
+            Logger.logInfo("No configuration found.")
             return null
         }
 
@@ -84,9 +95,14 @@ class KeystoreUtils(context: Context) {
         }
     }
 
+    @Synchronized
     fun clearConfig() {
-        sharedPreferences.edit().remove("tapp_config").apply()
-        Logger.logInfo("Configuration cleared.")
+        val success = sharedPreferences.edit().remove("tapp_config").commit()
+        if (success) {
+            Logger.logInfo("Configuration cleared.")
+        } else {
+            Logger.logError("Failed to clear configuration.")
+        }
     }
 
     fun hasConfig(): Boolean {
@@ -104,26 +120,23 @@ class KeystoreUtils(context: Context) {
 
             val encryptedData = cipher.doFinal(value.toByteArray(Charsets.UTF_8))
 
-            val ivBase64 = Base64.encodeToString(iv, Base64.DEFAULT)
-            val encryptedBase64 = Base64.encodeToString(encryptedData, Base64.DEFAULT)
+            val ivBase64 = Base64.encodeToString(iv, Base64.NO_WRAP)
+            val encryptedBase64 = Base64.encodeToString(encryptedData, Base64.NO_WRAP)
 
-            "$ivBase64:$encryptedBase64".also {
-                Logger.logInfo("Encryption complete. Encrypted config size: ${it.length}")
-            }
+            "$ivBase64:$encryptedBase64"
         } catch (e: Exception) {
             Logger.logError("Encryption failed: ${e.localizedMessage}")
             throw IllegalStateException("Failed to encrypt value. Cause: ${e.localizedMessage}", e)
         }
     }
 
-
     private fun decrypt(encryptedValue: String): String {
         return try {
             val parts = encryptedValue.split(":")
             if (parts.size != 2) throw IllegalArgumentException("Invalid encrypted value format")
 
-            val iv = Base64.decode(parts[0], Base64.DEFAULT)
-            val encryptedData = Base64.decode(parts[1], Base64.DEFAULT)
+            val iv = Base64.decode(parts[0], Base64.NO_WRAP)
+            val encryptedData = Base64.decode(parts[1], Base64.NO_WRAP)
 
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             val spec = GCMParameterSpec(128, iv)
@@ -140,4 +153,5 @@ class KeystoreUtils(context: Context) {
         return (keyStore.getEntry(keyAlias, null) as KeyStore.SecretKeyEntry).secretKey
     }
 }
+
 

@@ -42,17 +42,22 @@ data class TappConfiguration(
                 env == other.env &&
                 tappToken == other.tappToken &&
                 affiliate == other.affiliate &&
-                androidId == other.androidId
+                androidId == other.androidId &&
+                hasProcessedReferralEngine == other.hasProcessedReferralEngine
 
         val appTokensEqual = appToken == other.appToken
         return equalNonOptionalValues && appTokensEqual
     }
 
+
     override fun hashCode(): Int {
-        return authToken.hashCode() * 31 +
-                env.hashCode() +
-                tappToken.hashCode() +
-                affiliate.hashCode()+
-                (androidId?.hashCode() ?: 0)
+        var result = authToken.hashCode()
+        result = 31 * result + env.hashCode()
+        result = 31 * result + tappToken.hashCode()
+        result = 31 * result + affiliate.hashCode()
+        result = 31 * result + (androidId?.hashCode() ?: 0)
+        result = 31 * result + hasProcessedReferralEngine.hashCode()
+        return result
     }
+
 }
