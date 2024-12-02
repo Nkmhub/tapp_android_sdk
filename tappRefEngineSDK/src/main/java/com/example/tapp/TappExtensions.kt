@@ -160,6 +160,8 @@ internal fun Tapp.setProcessedReferralEngine() {
     storedConfig?.let {
         it.hasProcessedReferralEngine = true // Directly set the property
         dependencies.keystoreUtils.saveConfig(it)
+        Logger.logInfo("Updated hasProcessedReferralEngine to true in config: $it")
+
     }
 }
 

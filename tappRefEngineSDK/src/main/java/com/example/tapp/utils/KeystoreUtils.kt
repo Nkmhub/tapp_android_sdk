@@ -70,6 +70,8 @@ class KeystoreUtils(context: Context) {
             val success = sharedPreferences.edit().putString("tapp_config", encryptedConfig).commit()
             if (!success) {
                 Logger.logError("Failed to commit configuration to SharedPreferences.")
+            } else {
+                Logger.logInfo("Configuration successfully saved.")
             }
         } catch (e: Exception) {
             Logger.logError("Failed to save configuration: ${e.localizedMessage}")
@@ -82,8 +84,10 @@ class KeystoreUtils(context: Context) {
     fun getConfig(): TappConfiguration? {
         val encryptedConfig = sharedPreferences.getString("tapp_config", null)
         if (encryptedConfig == null) {
-            Logger.logInfo("No configuration found.")
+            Logger.logInfo("No configuration found in SharedPreferences.")
             return null
+        } else {
+            Logger.logInfo("Encrypted configuration retrieved: $encryptedConfig")
         }
 
         return try {

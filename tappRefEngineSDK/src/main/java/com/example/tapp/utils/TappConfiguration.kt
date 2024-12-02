@@ -12,7 +12,7 @@ data class TappConfiguration(
     val affiliate: Affiliate,
     val bundleID: String? = null,
     var appToken: String? = null,
-    var hasProcessedReferralEngine: Boolean = false,
+    var hasProcessedReferralEngine: Boolean,
     val androidId: String? = null
 ) {
 //    fun setAppToken(appToken: String) {
