@@ -1,5 +1,6 @@
 package com.example.tapp.services.network
 
+import android.net.Uri
 import com.example.tapp.dependencies.Dependencies
 import com.example.tapp.models.Environment
 
@@ -19,7 +20,7 @@ object TappEndpoint {
     }
 
     // Endpoint for handling deeplink impressions
-    fun deeplink(dependencies: Dependencies, deepLink: String): RequestModels.Endpoint {
+    fun deeplink(dependencies: Dependencies, deepLink: Uri): RequestModels.Endpoint {
         val config = dependencies.keystoreUtils.getConfig()
             ?: throw TappError.MissingConfiguration("Missing configuration in keystore")
 

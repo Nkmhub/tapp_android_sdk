@@ -1,5 +1,6 @@
 package com.example.tapp.services.affiliate.tapp
 
+import android.net.Uri
 import com.example.tapp.dependencies.Dependencies
 import com.example.tapp.models.Affiliate
 import com.example.tapp.services.affiliate.AffiliateService
@@ -15,18 +16,26 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 class TappAffiliateService(private val dependencies: Dependencies) : AffiliateService {
-    private val baseAPIURL = "https://www.nkmhub.com/api/wre/"
+    private var isTapEnabled: Boolean = true // Default value
 
     override fun initialize(): Boolean {
         TODO("TAPP: Not yet implemented")
     }
 
-    override fun handleCallback(deepLink: String) {
+    override fun handleCallback(deepLink: Uri) {
         TODO("TAPP: Not yet implemented")
     }
 
     override fun handleEvent(eventId: String) {
         Logger.logWarning("Use the handleTappEvent method to handle Tapp events")
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        isTapEnabled = enabled
+    }
+
+    override fun isEnabled(): Boolean {
+        return isTapEnabled
     }
 
     suspend fun generateAffiliateUrl(request: RequestModels.AffiliateUrlRequest): RequestModels.AffiliateUrlResponse = withContext(Dispatchers.IO) {
@@ -104,8 +113,9 @@ class TappAffiliateService(private val dependencies: Dependencies) : AffiliateSe
         }
     }
 
-    fun handleImpression(url: String, completion: VoidCompletion?) {
-        val config = dependencies.keystoreUtils.getConfig()
+    fun handleImpression(url: Uri, completion: VoidCompletion?) {
+
+        dependencies.keystoreUtils.getConfig()
             ?: return completion?.invoke(Result.failure(TappError.MissingConfiguration("Missing configuration"))) ?: Unit
 
         val endpoint = TappEndpoint.deeplink(dependencies, deepLink = url)

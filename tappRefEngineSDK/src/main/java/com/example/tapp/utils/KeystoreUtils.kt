@@ -19,6 +19,8 @@ class KeystoreUtils(context: Context) {
     private val keyStore: KeyStore = KeyStore.getInstance("AndroidKeyStore")
     private val sharedPreferences = context.getSharedPreferences("keystore_prefs", Context.MODE_PRIVATE)
 
+    private val json = Json { encodeDefaults = true }
+
     init {
         try {
             keyStore.load(null)
@@ -56,12 +58,10 @@ class KeystoreUtils(context: Context) {
     }
 
     fun saveConfig(config: TappConfiguration) {
-        Logger.logInfo("Start saving config: $config")
-        val jsonConfig = Json.encodeToString(config)
+        val jsonConfig = json.encodeToString(config)
         Logger.logInfo("Saving config: $jsonConfig")
         try {
             val encryptedConfig = encrypt(jsonConfig)
-            Logger.logInfo("Encrypted config size: ${encryptedConfig.length}")
             sharedPreferences.edit().putString("tapp_config", encryptedConfig).apply()
         } catch (e: Exception) {
             Logger.logError("Failed to save configuration: ${e.localizedMessage}")
@@ -77,8 +77,7 @@ class KeystoreUtils(context: Context) {
 
         return try {
             val decryptedConfig = decrypt(encryptedConfig)
-            Logger.logInfo("Retrieved config: $decryptedConfig")
-            Json.decodeFromString(decryptedConfig)
+            json.decodeFromString(decryptedConfig)
         } catch (e: Exception) {
             Logger.logError("Failed to decrypt configuration: ${e.localizedMessage}")
             null
@@ -98,16 +97,12 @@ class KeystoreUtils(context: Context) {
 
     private fun encrypt(value: String): String {
         return try {
-            Logger.logInfo("Starting encryption for value: ${value.take(100)}... (truncated for log)")
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            Logger.logInfo("Cipher initialized successfully")
 
             cipher.init(Cipher.ENCRYPT_MODE, getSecretKey())
             val iv = cipher.iv
-            Logger.logInfo("Generated IV: ${Base64.encodeToString(iv, Base64.DEFAULT)}")
 
             val encryptedData = cipher.doFinal(value.toByteArray(Charsets.UTF_8))
-            Logger.logInfo("Encrypted data length: ${encryptedData.size}")
 
             val ivBase64 = Base64.encodeToString(iv, Base64.DEFAULT)
             val encryptedBase64 = Base64.encodeToString(encryptedData, Base64.DEFAULT)

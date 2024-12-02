@@ -1,5 +1,6 @@
 package com.example.tapp
 
+import android.net.Uri
 import com.example.tapp.models.Affiliate
 import com.example.tapp.services.affiliate.tapp.TappAffiliateService
 import com.example.tapp.services.network.RequestModels
@@ -9,11 +10,11 @@ import com.example.tapp.utils.TappConfiguration
 import com.example.tapp.utils.VoidCompletion
 
 
-internal fun Tapp.appWillOpen(url: String, authToken: String, completion: VoidCompletion?) {
+internal fun Tapp.appWillOpen(url: Uri, completion: VoidCompletion?) {
     fetchSecretsAndInitializeReferralEngineIfNeeded { result ->
         result.fold(
             onSuccess = {
-                handleReferralCallback(url, authToken, completion)
+                handleReferralCallback(url, completion)
             },
             onFailure = { error ->
                 completion?.invoke(Result.failure(error))
@@ -23,8 +24,7 @@ internal fun Tapp.appWillOpen(url: String, authToken: String, completion: VoidCo
 }
 
 internal fun Tapp.handleReferralCallback(
-    url: String,
-    authToken: String,
+    url: Uri,
     completion: VoidCompletion?
 ) {
     // Step 1: Use Tapp service for handleImpression
@@ -69,13 +69,12 @@ internal fun Tapp.handleReferralCallback(
 
 internal fun Tapp.fetchSecretsAndInitializeReferralEngineIfNeeded(completion: VoidCompletion?) {
     val config = dependencies.keystoreUtils.getConfig()
-    Logger.logInfo("start fetchSecretsAndInitializeReferralEngineIfNeeded $config")
     if (config == null) {
         completion?.invoke(Result.failure(TappError.MissingConfiguration()))
         return
     }
 
-    secrets(config) { result: Result<Unit> ->
+    secrets() { result: Result<Unit> ->
         result.fold(
             onSuccess = {
                 initializeAffiliateService(completion)
@@ -89,8 +88,7 @@ internal fun Tapp.fetchSecretsAndInitializeReferralEngineIfNeeded(completion: Vo
     }
 }
 
-internal fun Tapp.secrets(config: TappConfiguration, completion: (Result<Unit>) -> Unit) {
-    Logger.logInfo("start secret service!")
+internal fun Tapp.secrets(completion: (Result<Unit>) -> Unit) {
     val storedConfig = dependencies.keystoreUtils.getConfig()
     if (storedConfig == null) {
         completion(Result.failure(TappError.MissingConfiguration()))
@@ -133,11 +131,18 @@ internal fun Tapp.initializeAffiliateService(completion: VoidCompletion?) {
         return
     }
 
+    if (affiliateService.isEnabled()) {
+        completion?.invoke(Result.success(Unit))
+        return
+    }
+
     val success = affiliateService.initialize()
 
     if (success) {
+        affiliateService.setEnabled(true)
         completion?.invoke(Result.success(Unit))
     } else {
+        affiliateService.setEnabled(false)
         completion?.invoke(
             Result.failure(
                 TappError.InitializationFailed(
@@ -147,6 +152,7 @@ internal fun Tapp.initializeAffiliateService(completion: VoidCompletion?) {
         )
     }
 }
+
 
 
 internal fun Tapp.setProcessedReferralEngine() {

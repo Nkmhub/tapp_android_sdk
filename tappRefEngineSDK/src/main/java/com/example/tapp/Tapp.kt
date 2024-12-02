@@ -1,6 +1,7 @@
 package com.example.tapp
 
 import android.content.Context
+import android.net.Uri
 import com.example.tapp.dependencies.Dependencies
 import com.example.tapp.models.Affiliate
 import com.example.tapp.services.affiliate.tapp.TappAffiliateService
@@ -57,7 +58,14 @@ class Tapp(context: Context) {
 
 
 
-    fun appWillOpen(url: String, completion: VoidCompletion?) {
+    fun appWillOpen(url: String?, completion: VoidCompletion?) {
+
+        if (url.isNullOrEmpty()) {
+            Logger.logInfo("No URL provided. Skipping appWillOpen processing.")
+            completion?.invoke(Result.success(Unit))
+            return
+        }
+
         // Step 1: Check if the referral engine is already processed
         if (hasProcessedReferralEngine()) {
             Logger.logInfo("Referral engine already processed. Returning early.")
@@ -65,6 +73,7 @@ class Tapp(context: Context) {
             return
         }
 
+        val parsedUri = Uri.parse(url)
         // Step 2: Get the configuration
         val config = dependencies.keystoreUtils.getConfig()
         if (config == null) {
@@ -73,7 +82,7 @@ class Tapp(context: Context) {
         }
 
         // Step 3: Continue to the next logic
-        appWillOpen(url, config.authToken, completion)
+        appWillOpen(parsedUri, completion)
     }
 
     fun logConfig() {

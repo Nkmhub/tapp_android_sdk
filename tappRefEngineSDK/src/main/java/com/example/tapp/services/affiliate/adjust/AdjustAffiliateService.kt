@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AdjustAffiliateService(private val dependencies: Dependencies) : AffiliateService {
+    private var isAdjustEnabled: Boolean = true // Default value
 
     override fun initialize(): Boolean {
         val context = dependencies.context
@@ -35,10 +36,6 @@ class AdjustAffiliateService(private val dependencies: Dependencies) : Affiliate
             val adjustEnvironment = when (config.env) {
                 Environment.PRODUCTION -> AdjustConfig.ENVIRONMENT_PRODUCTION
                 Environment.SANDBOX-> AdjustConfig.ENVIRONMENT_SANDBOX
-                else -> {
-                    Logger.logWarning("Error: Missing required param Environment")
-                    return false
-                }
             }
 
 
@@ -53,18 +50,25 @@ class AdjustAffiliateService(private val dependencies: Dependencies) : Affiliate
     }
 
 
-    override fun handleCallback(deepLink: String) {
+    override fun handleCallback(deepLink: Uri) {
         val context = dependencies.context
-        val incomingUri = Uri.parse(deepLink)
-        val url = AdjustDeeplink(incomingUri)
+        val url = AdjustDeeplink(deepLink)
         Adjust.processDeeplink(url, context)
-        Logger.logInfo("Adjust notified of the incoming URL: $incomingUri")
+        Logger.logInfo("Adjust notified of the incoming URL: $deepLink")
     }
 
     override fun handleEvent(eventId: String) {
         val adjustEvent = AdjustEvent(eventId)
         Adjust.trackEvent(adjustEvent)
         Logger.logInfo("Adjust tracked Event for event_id: $eventId")
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        isAdjustEnabled = enabled
+    }
+
+    override fun isEnabled(): Boolean {
+        return isAdjustEnabled
     }
 
     // MARK: - Monetization
