@@ -33,18 +33,35 @@ class Tapp(context: Context) {
         val bundleID = dependencies.context.packageName
         Logger.logInfo("Bundle ID: $bundleID")
 
-        val internalConfig = InternalConfiguration(
-            authToken = config.authToken,
-            env = config.env,
-            tappToken = config.tappToken,
-            affiliate = config.affiliate,
-            bundleID = bundleID,
-            androidId = androidId
-        )
+        // Load the stored configuration
+        val storedConfig = dependencies.keystoreUtils.getConfig()
+
+        val internalConfig = if (storedConfig != null) {
+            // Create a new configuration by copying the stored one and updating necessary fields
+            storedConfig.copy(
+                authToken = config.authToken,
+                env = config.env,
+                tappToken = config.tappToken,
+                affiliate = config.affiliate,
+                bundleID = bundleID,
+                androidId = androidId
+                // Note: We do not reset appToken or hasProcessedReferralEngine
+            )
+        } else {
+            // No stored configuration exists; create a new one
+            InternalConfiguration(
+                authToken = config.authToken,
+                env = config.env,
+                tappToken = config.tappToken,
+                affiliate = config.affiliate,
+                bundleID = bundleID,
+                androidId = androidId
+            )
+        }
 
         Logger.logInfo("InternalConfig: $internalConfig")
 
-        val storedConfig = dependencies.keystoreUtils.getConfig()
+        // Save the configuration only if it has changed
         if (storedConfig == null || storedConfig != internalConfig) {
             Logger.logInfo("Saving new configuration")
             dependencies.keystoreUtils.saveConfig(internalConfig)

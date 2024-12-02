@@ -42,6 +42,7 @@ internal class AdjustAffiliateService(private val dependencies: Dependencies) : 
             val adjustConfig = AdjustConfig(context, config.appToken, adjustEnvironment)
             adjustConfig.setLogLevel(LogLevel.VERBOSE)
             Adjust.initSdk(adjustConfig)
+            Logger.logInfo("Adjust initialized")
             true
         } catch (e: Exception) {
             Logger.logWarning("Error during Adjust referral processing: ${e.message}")
