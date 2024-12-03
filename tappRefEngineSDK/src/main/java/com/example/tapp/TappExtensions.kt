@@ -51,16 +51,8 @@ internal fun Tapp.handleReferralCallback(
                     return@fold
                 }
                 affiliateService.handleCallback(url) // Call handleCallback on user's affiliate service
+                saveDeepLinkUrl(url.toString())
                 setProcessedReferralEngine()
-
-                if (storedConfig != null) {
-                    storedConfig.deepLinkUrl = url.toString()
-                    dependencies.keystoreUtils.saveConfig(storedConfig)
-                    Logger.logInfo("Deep link URL saved: ${url.toString()}")
-                } else {
-                    Logger.logWarning("Failed to save deep link URL: Configuration not found")
-                }
-
                 completion?.invoke(Result.success(Unit))
             },
             onFailure = { error ->
@@ -171,19 +163,41 @@ internal fun Tapp.initializeAffiliateService(completion: VoidCompletion?) {
     }
 }
 
+internal fun Tapp.saveDeepLinkUrl(deepLinkUrl: String?) {
+    if (deepLinkUrl.isNullOrBlank()) {
+        Logger.logWarning("Cannot save deep link URL: URL is null or blank")
+        return
+    }
 
-internal fun Tapp.setProcessedReferralEngine() {
-    val storedConfig = dependencies.keystoreUtils.getConfig()
-    storedConfig?.let {
-        it.hasProcessedReferralEngine = true // Directly set the property
-        dependencies.keystoreUtils.saveConfig(it)
-        Logger.logInfo("Updated hasProcessedReferralEngine to true in config: $it")
-
+    Logger.logInfo("Saving deep link URL: $deepLinkUrl")
+    val config = dependencies.keystoreUtils.getConfig()
+    if (config != null) {
+        val updatedConfig = config.copy(deepLinkUrl = deepLinkUrl)
+        dependencies.keystoreUtils.saveConfig(updatedConfig)
+        Logger.logInfo("Deep link URL saved: $deepLinkUrl")
+    } else {
+        Logger.logError("Failed to save deep link URL: configuration is null")
     }
 }
+
+
+
+internal fun Tapp.setProcessedReferralEngine() {
+    val config = dependencies.keystoreUtils.getConfig()
+    if (config != null) {
+        val updatedConfig = config.copy(hasProcessedReferralEngine = true)
+        dependencies.keystoreUtils.saveConfig(updatedConfig)
+        Logger.logInfo("Updated hasProcessedReferralEngine to true in config: $updatedConfig")
+    } else {
+        Logger.logWarning("Cannot set hasProcessedReferralEngine to true: config is null")
+    }
+}
+
 
 internal fun Tapp.hasProcessedReferralEngine(): Boolean {
     return dependencies.keystoreUtils.getConfig()?.hasProcessedReferralEngine
         ?: false // Directly access the property
 }
+
+
 
