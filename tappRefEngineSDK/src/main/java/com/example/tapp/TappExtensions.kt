@@ -39,7 +39,7 @@ internal fun Tapp.handleReferralCallback(
     tappService.handleImpression(url) { result ->
         result.fold(
             onSuccess = {
-                Logger.logInfo("start handleImpression")
+                Logger.logInfo("start handleImpression with result: $result")
                 // Step 2: Use user's configured affiliate service for handleCallback
                 val affiliateService = dependencies.affiliateServiceFactory.getAffiliateService(
                     dependencies.keystoreUtils.getConfig()?.affiliate ?: Affiliate.TAPP,
