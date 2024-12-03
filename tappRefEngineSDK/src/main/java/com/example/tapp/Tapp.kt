@@ -36,22 +36,29 @@ class Tapp(context: Context) {
         // Load the stored configuration
         val storedConfig = dependencies.keystoreUtils.getConfig()
 
-        val internalConfig = storedConfig?.copy(
-            authToken = config.authToken,
-            env = config.env,
-            tappToken = config.tappToken,
-            affiliate = config.affiliate,
-            bundleID = bundleID,
-            androidId = androidId
-        ) ?: InternalConfiguration(
-            authToken = config.authToken,
-            env = config.env,
-            tappToken = config.tappToken,
-            affiliate = config.affiliate,
-            bundleID = bundleID,
-            androidId = androidId
-        )
-
+        val internalConfig = if (storedConfig != null) {
+            storedConfig.copy(
+                authToken = config.authToken,
+                env = config.env,
+                tappToken = config.tappToken,
+                affiliate = config.affiliate,
+                bundleID = bundleID,
+                androidId = androidId,
+                // Ensure we preserve these fields
+                hasProcessedReferralEngine = storedConfig.hasProcessedReferralEngine,
+                appToken = storedConfig.appToken,
+                deepLinkUrl = storedConfig.deepLinkUrl
+            )
+        } else {
+            InternalConfiguration(
+                authToken = config.authToken,
+                env = config.env,
+                tappToken = config.tappToken,
+                affiliate = config.affiliate,
+                bundleID = bundleID,
+                androidId = androidId
+            )
+        }
 
         Logger.logInfo("InternalConfig: $internalConfig")
 

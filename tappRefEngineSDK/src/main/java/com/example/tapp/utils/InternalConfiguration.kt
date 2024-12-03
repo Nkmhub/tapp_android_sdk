@@ -2,6 +2,7 @@ package com.example.tapp.utils
 
 import com.example.tapp.models.Affiliate
 import com.example.tapp.models.Environment
+import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,7 +13,7 @@ internal data class InternalConfiguration(
     val affiliate: Affiliate,
     val bundleID: String,
     var appToken: String? = null,
-    var hasProcessedReferralEngine: Boolean = false,
+    @Required var hasProcessedReferralEngine: Boolean = false,
     val androidId: String,
     var deepLinkUrl: String? = null
 ) {
@@ -31,6 +32,7 @@ internal data class InternalConfiguration(
     }
 
 
+
     override fun hashCode(): Int {
         var result = authToken.hashCode()
         result = 31 * result + env.hashCode()
@@ -42,4 +44,5 @@ internal data class InternalConfiguration(
         result = 31 * result + (deepLinkUrl?.hashCode() ?: 0)
         return result
     }
+
 }

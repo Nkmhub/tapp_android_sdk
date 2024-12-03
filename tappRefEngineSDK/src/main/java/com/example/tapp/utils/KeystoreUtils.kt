@@ -64,7 +64,7 @@ internal class KeystoreUtils(context: Context) {
     @Synchronized
     internal fun saveConfig(config: InternalConfiguration) {
         val jsonConfig = json.encodeToString(config)
-        Logger.logInfo("Saving internal configuration.")
+        Logger.logInfo("Saving internal configuration: $jsonConfig")
         try {
             val encryptedConfig = encrypt(jsonConfig)
             val success = sharedPreferences.edit().putString("tapp_config", encryptedConfig).commit()
@@ -91,12 +91,14 @@ internal class KeystoreUtils(context: Context) {
 
         return try {
             val decryptedConfig = decrypt(encryptedConfig)
+            Logger.logInfo("Retrieved internal configuration: $decryptedConfig")
             json.decodeFromString<InternalConfiguration>(decryptedConfig)
         } catch (e: Exception) {
             Logger.logError("Failed to decrypt configuration: ${e.localizedMessage}")
             null
         }
     }
+
 
     @Synchronized
     internal fun clearConfig() {
@@ -125,6 +127,7 @@ internal class KeystoreUtils(context: Context) {
 
             val ivBase64 = Base64.encodeToString(iv, Base64.NO_WRAP)
             val encryptedBase64 = Base64.encodeToString(encryptedData, Base64.NO_WRAP)
+            Logger.logInfo("Encrypted data: $encryptedBase64")
 
             "$ivBase64:$encryptedBase64"
         } catch (e: Exception) {
@@ -145,14 +148,25 @@ internal class KeystoreUtils(context: Context) {
             val spec = GCMParameterSpec(128, iv)
             cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec)
             val decryptedData = cipher.doFinal(encryptedData)
-            String(decryptedData, Charsets.UTF_8)
+            val decryptedString = String(decryptedData, Charsets.UTF_8)
+            Logger.logInfo("Decrypted data: $decryptedString")
+
+            decryptedString
         } catch (e: Exception) {
             Logger.logError("Decryption failed: ${e.localizedMessage}")
             throw e
         }
     }
 
+
     private fun getSecretKey(): SecretKey {
-        return (keyStore.getEntry(keyAlias, null) as KeyStore.SecretKeyEntry).secretKey
+        val secretKeyEntry = keyStore.getEntry(keyAlias, null) as? KeyStore.SecretKeyEntry
+        if (secretKeyEntry == null) {
+            Logger.logError("Secret key not found. Recreating key.")
+            createKey()
+            return (keyStore.getEntry(keyAlias, null) as KeyStore.SecretKeyEntry).secretKey
+        }
+        return secretKeyEntry.secretKey
     }
+
 }
