@@ -6,7 +6,7 @@ import com.example.tapp.services.affiliate.AffiliateService
 import com.example.tapp.utils.Logger
 
 internal class AppsflyerAffiliateService(private val dependencies: Dependencies) : AffiliateService {
-    private var isAppflyerEnabled: Boolean = true // Default value
+    private var isAppflyerEnabled: Boolean = false
 
     override fun initialize(): Boolean {
         TODO("APPFLYER: Add your AppFlyer-specific logic here")

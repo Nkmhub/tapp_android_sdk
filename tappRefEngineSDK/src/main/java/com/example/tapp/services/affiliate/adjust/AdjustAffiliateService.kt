@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 internal class AdjustAffiliateService(private val dependencies: Dependencies) : AffiliateService {
-    private var isAdjustEnabled: Boolean = true // Default value
+    private var isAdjustEnabled: Boolean = false
 
     override fun initialize(): Boolean {
         val context = dependencies.context

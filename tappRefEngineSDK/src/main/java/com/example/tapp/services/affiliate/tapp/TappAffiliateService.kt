@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 internal class TappAffiliateService(private val dependencies: Dependencies) : AffiliateService {
-    private var isTapEnabled: Boolean = true // Default value
+    private var isTapEnabled: Boolean = false
 
     override fun initialize(): Boolean {
         TODO("TAPP: Not yet implemented")

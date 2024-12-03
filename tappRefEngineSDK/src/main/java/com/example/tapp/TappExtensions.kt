@@ -27,6 +27,7 @@ internal fun Tapp.handleReferralCallback(
     url: Uri,
     completion: VoidCompletion?
 ) {
+    val storedConfig = dependencies.keystoreUtils.getConfig()
     // Step 1: Use Tapp service for handleImpression
     val tappService =
         dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)
@@ -38,6 +39,7 @@ internal fun Tapp.handleReferralCallback(
     tappService.handleImpression(url) { result ->
         result.fold(
             onSuccess = {
+                Logger.logInfo("start handleImpression")
                 // Step 2: Use user's configured affiliate service for handleCallback
                 val affiliateService = dependencies.affiliateServiceFactory.getAffiliateService(
                     dependencies.keystoreUtils.getConfig()?.affiliate ?: Affiliate.TAPP,
@@ -48,9 +50,17 @@ internal fun Tapp.handleReferralCallback(
                     completion?.invoke(Result.failure(TappError.MissingAffiliateService("Affiliate service not available")))
                     return@fold
                 }
-
                 affiliateService.handleCallback(url) // Call handleCallback on user's affiliate service
                 setProcessedReferralEngine()
+
+                if (storedConfig != null) {
+                    storedConfig.deepLinkUrl = url.toString()
+                    dependencies.keystoreUtils.saveConfig(storedConfig)
+                    Logger.logInfo("Deep link URL saved: ${url.toString()}")
+                } else {
+                    Logger.logWarning("Failed to save deep link URL: Configuration not found")
+                }
+
                 completion?.invoke(Result.success(Unit))
             },
             onFailure = { error ->
@@ -139,6 +149,7 @@ internal fun Tapp.initializeAffiliateService(completion: VoidCompletion?) {
     }
 
     if (affiliateService.isEnabled()) {
+        Logger.logInfo("Affiliate service is already enabled. Skipping initialization.")
         completion?.invoke(Result.success(Unit))
         return
     }
