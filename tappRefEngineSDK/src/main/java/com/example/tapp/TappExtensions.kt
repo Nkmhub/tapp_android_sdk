@@ -27,7 +27,6 @@ internal fun Tapp.handleReferralCallback(
     url: Uri,
     completion: VoidCompletion?
 ) {
-    val storedConfig = dependencies.keystoreUtils.getConfig()
     // Step 1: Use Tapp service for handleImpression
     val tappService =
         dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)

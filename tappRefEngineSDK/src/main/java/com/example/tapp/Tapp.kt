@@ -64,9 +64,7 @@ class Tapp(context: Context) {
 
         // Save the configuration only if it has changed
         if (storedConfig == null || storedConfig != internalConfig) {
-            Logger.logInfo("Saving new configuration")
             dependencies.keystoreUtils.saveConfig(internalConfig)
-            Logger.logInfo("Configuration saved")
         } else {
             Logger.logInfo("Configuration already exists")
         }

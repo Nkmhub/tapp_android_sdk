@@ -73,6 +73,7 @@ class RequestModels {
     )
 
     sealed class EventAction(val rawValue: Int) {
+        //TODO:: ADD MORE EVENTS
         data object Click : EventAction(1)
         data object Impression : EventAction(2)
         data object Count : EventAction(3)

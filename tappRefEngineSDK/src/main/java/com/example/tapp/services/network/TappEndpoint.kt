@@ -31,8 +31,9 @@ internal object TappEndpoint {
         )
         val body = mapOf(
             "tapp_token" to config.tappToken,
-            "bundleID" to (config.bundleID?:""),
-            "deepLink" to deepLink
+            "bundle_id" to (config.bundleID?:false),
+            "android_id" to (config.androidId?:false),
+            "deeplink" to deepLink
         )
 
         return RequestModels.Endpoint(url, headers, body)

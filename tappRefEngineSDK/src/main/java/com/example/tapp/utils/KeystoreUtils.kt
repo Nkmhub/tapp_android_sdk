@@ -91,7 +91,6 @@ internal class KeystoreUtils(context: Context) {
 
         return try {
             val decryptedConfig = decrypt(encryptedConfig)
-            Logger.logInfo("Retrieved internal configuration: $decryptedConfig")
             json.decodeFromString<InternalConfiguration>(decryptedConfig)
         } catch (e: Exception) {
             Logger.logError("Failed to decrypt configuration: ${e.localizedMessage}")
