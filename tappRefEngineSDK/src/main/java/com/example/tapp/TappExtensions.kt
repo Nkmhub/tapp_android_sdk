@@ -37,9 +37,9 @@ internal fun Tapp.handleReferralCallback(
 
     tappService.handleImpression(url) { result ->
         result.fold(
-            onSuccess = {
-                Logger.logInfo("start handleImpression with result: $result")
-                // Step 2: Use user's configured affiliate service for handleCallback
+            onSuccess = { tappUrlResponse ->
+                Logger.logInfo("start handleImpression with result: $tappUrlResponse")
+
                 val affiliateService = dependencies.affiliateServiceFactory.getAffiliateService(
                     dependencies.keystoreUtils.getConfig()?.affiliate ?: Affiliate.TAPP,
                     dependencies
@@ -49,9 +49,17 @@ internal fun Tapp.handleReferralCallback(
                     completion?.invoke(Result.failure(TappError.MissingAffiliateService("Affiliate service not available")))
                     return@fold
                 }
-                affiliateService.handleCallback(url) // Call handleCallback on user's affiliate service
+
+                // Check if error is true before calling handleCallback
+                if (!tappUrlResponse.error) {
+                    // Only call handleCallback if error == false
+                    affiliateService.handleCallback(url)
+                }
+
+                // Always run these two calls regardless of error state
                 saveDeepLinkUrl(url.toString())
                 setProcessedReferralEngine()
+
                 completion?.invoke(Result.success(Unit))
             },
             onFailure = { error ->
@@ -66,6 +74,7 @@ internal fun Tapp.handleReferralCallback(
             }
         )
     }
+
 }
 
 internal fun Tapp.fetchSecretsAndInitializeReferralEngineIfNeeded(completion: VoidCompletion?) {

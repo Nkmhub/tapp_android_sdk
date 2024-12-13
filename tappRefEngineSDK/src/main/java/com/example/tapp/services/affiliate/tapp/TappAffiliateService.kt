@@ -113,23 +113,29 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
         }
     }
 
-    fun handleImpression(url: Uri, completion: VoidCompletion?) {
-
-        dependencies.keystoreUtils.getConfig()
-            ?: return completion?.invoke(Result.failure(TappError.MissingConfiguration("Missing configuration"))) ?: Unit
+    fun handleImpression(url: Uri, completion: (Result<RequestModels.TappUrlResponse>) -> Unit) {
+        val config = dependencies.keystoreUtils.getConfig()
+            ?: return completion(Result.failure(TappError.MissingConfiguration("Missing configuration")))
 
         val endpoint = TappEndpoint.deeplink(dependencies, deepLink = url)
 
         CoroutineScope(Dispatchers.IO).launch {
-            val result = dependencies.networkManager.postRequest(endpoint.url, endpoint.body, endpoint.headers)
+            val networkResult = dependencies.networkManager.postRequest(endpoint.url, endpoint.body, endpoint.headers)
             withContext(Dispatchers.Main) {
-                result.fold(
-                    onSuccess = { completion?.invoke(Result.success(Unit)) ?: Unit },
-                    onFailure = { error -> completion?.invoke(Result.failure(error)) ?: Unit }
+                networkResult.fold(
+                    onSuccess = { jsonObject ->
+                        // jsonObject is already a JSONObject
+                        val tappUrlResponse = parseTappUrlResponse(jsonObject)
+                        completion(Result.success(tappUrlResponse))
+                    },
+                    onFailure = { error ->
+                        completion(Result.failure(error))
+                    }
                 )
             }
         }
     }
+
 
 
     suspend fun trackEvent(tappEventRequest: RequestModels.TappEventRequest): Result<Unit> {
@@ -173,6 +179,13 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
             throw TappError.InvalidResponse()
         }
         return RequestModels.SecretsResponse(secret)
+    }
+
+    private fun parseTappUrlResponse(jsonObject: JSONObject): RequestModels.TappUrlResponse {
+        return RequestModels.TappUrlResponse(
+            error = jsonObject.optBoolean("error", false),
+            message = jsonObject.optString("message", ""),
+        )
     }
 
 

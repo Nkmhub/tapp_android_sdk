@@ -72,6 +72,11 @@ class RequestModels {
         val message: String,
     )
 
+    data class TappUrlResponse(
+        val error: Boolean,
+        val message: String,
+    )
+
     sealed class EventAction(val rawValue: Int) {
         //TODO:: ADD MORE EVENTS
         data object Click : EventAction(1)
