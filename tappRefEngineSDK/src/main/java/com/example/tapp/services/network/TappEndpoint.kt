@@ -90,7 +90,7 @@ internal object TappEndpoint {
         val config = dependencies.keystoreUtils.getConfig()
             ?: throw TappError.MissingConfiguration("Configuration is missing")
 
-        val url = "${getBaseUrl(config.env.environmentName())}/event"
+        val url = "${getBaseUrl(config.env.environmentName())}event"
         val headers = mapOf(
             "Content-Type" to "application/json",
             "Authorization" to "Bearer ${config.authToken}"
