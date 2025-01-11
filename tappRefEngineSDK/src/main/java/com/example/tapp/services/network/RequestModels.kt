@@ -63,8 +63,7 @@ class RequestModels {
         val eventCustomAction: Any    // false or a String if eventAction is -1
     )
     data class TappEvent(
-        val eventName: String,
-        val eventAction: EventAction
+        val eventName: EventAction,
     )
 
     data class TappEventResponse(
@@ -122,25 +121,25 @@ class RequestModels {
         data object TAPP_BEGIN_TUTORIAL : EventAction(39)
         data object TAPP_COMPLETE_TUTORIAL : EventAction(40)
 
-        data class Custom(val customValue: String) : EventAction(0)
+//        data class Custom(val customValue: String) : EventAction(0)
 
         // Determine if the action is custom
-        val isCustom: Boolean
-            get() = this is Custom
-
-        // Check if the action is valid
-        val isValid: Boolean
-            get() = when (this) {
-                is Custom -> customValue.isNotEmpty()
-                else -> true
-            }
-
-        // Return the custom action string or default "false" for non-custom actions
-        val eventCustomAction: String
-            get() = when (this) {
-                is Custom -> if (customValue.isNotEmpty()) customValue else "false"
-                else -> "false"
-            }
+//        val isCustom: Boolean
+//            get() = this is Custom
+//
+//        // Check if the action is valid
+//        val isValid: Boolean
+//            get() = when (this) {
+//                is Custom -> customValue.isNotEmpty()
+//                else -> true
+//            }
+//
+//        // Return the custom action string or default "false" for non-custom actions
+//        val eventCustomAction: String
+//            get() = when (this) {
+//                is Custom -> if (customValue.isNotEmpty()) customValue else "false"
+//                else -> "false"
+//            }
     }
 
 }

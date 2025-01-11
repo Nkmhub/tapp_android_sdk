@@ -138,7 +138,7 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
 
 
 
-    suspend fun trackEvent(tappEventRequest: RequestModels.TappEventRequest): Result<Unit> {
+    suspend fun trackEvent(tappEventRequest: RequestModels.TappEvent): Result<Unit> {
         val endpoint = TappEndpoint.tappEvent(dependencies, tappEventRequest)
 
         return withContext(Dispatchers.IO) {

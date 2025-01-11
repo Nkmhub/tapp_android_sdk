@@ -195,17 +195,7 @@ class Tapp(context: Context) {
                 return@launch
             }
 
-            val tappEventRequest = RequestModels.TappEventRequest(
-                eventName = tappEvent.eventName,
-                eventAction = tappEvent.eventAction.rawValue,
-                eventCustomAction = if (tappEvent.eventAction is RequestModels.EventAction.Custom) {
-                    tappEvent.eventAction.eventCustomAction
-                } else {
-                    "false"
-                }
-            )
-
-            val result = tappService.trackEvent(tappEventRequest)
+            val result = tappService.trackEvent(tappEvent)
 
             withContext(Dispatchers.Main) {
                 result.fold(

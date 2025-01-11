@@ -85,7 +85,7 @@ internal object TappEndpoint {
 
     fun tappEvent(
         dependencies: Dependencies,
-        eventRequest: RequestModels.TappEventRequest
+        eventRequest: RequestModels.TappEvent
     ): RequestModels.Endpoint {
         val config = dependencies.keystoreUtils.getConfig()
             ?: throw TappError.MissingConfiguration("Configuration is missing")
@@ -100,8 +100,7 @@ internal object TappEndpoint {
             "tapp_token" to config.tappToken,
             "bundle_id" to (config.bundleID?:""),
             "event_name" to eventRequest.eventName,
-            "event_action" to eventRequest.eventAction,
-            "event_custom_action" to eventRequest.eventCustomAction
+            "event_url" to (config.deepLinkUrl?:""),
         ).filterValues { it != null } // Remove null entries
 
         return RequestModels.Endpoint(url, headers, body)
