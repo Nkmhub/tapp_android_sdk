@@ -19,7 +19,9 @@ import com.example.tapp.utils.InternalConfiguration
 
 class Tapp(context: Context) {
 
-    internal val dependencies = Dependencies.live(context)
+    internal val dependencies = Dependencies.live(context).apply {
+        tappInstance = this@Tapp
+    }
 
     fun start(config: TappConfiguration) {
         Logger.logInfo("Start config")
@@ -44,7 +46,6 @@ class Tapp(context: Context) {
                 affiliate = config.affiliate,
                 bundleID = bundleID,
                 androidId = androidId,
-                // Ensure we preserve these fields
                 hasProcessedReferralEngine = storedConfig.hasProcessedReferralEngine,
                 appToken = storedConfig.appToken,
                 deepLinkUrl = storedConfig.deepLinkUrl
@@ -85,7 +86,7 @@ class Tapp(context: Context) {
 
 
 
-    fun appWillOpen(url: String?, completion: VoidCompletion?) {
+    internal fun appWillOpen(url: String?, completion: VoidCompletion?) {
 
         if (url.isNullOrEmpty()) {
             Logger.logInfo("No URL provided. Skipping appWillOpen processing.")
