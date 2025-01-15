@@ -43,6 +43,15 @@ internal class AdjustAffiliateService(private val dependencies: Dependencies) : 
             adjustConfig.setLogLevel(LogLevel.VERBOSE)
             Adjust.initSdk(adjustConfig)
             Logger.logInfo("Adjust initialized")
+
+            // Register Deeplink Listener
+            adjustConfig.setOnDeferredDeeplinkResponseListener { deeplink ->
+                handleAdjustDeeplink(deeplink)
+                // Returning false indicates that the deeplink is not consumed and should be processed further
+                false
+            }
+
+            Logger.logInfo("Adjust deeplink listener registered")
             true
         } catch (e: Exception) {
             Logger.logWarning("Error during Adjust referral processing: ${e.message}")
@@ -131,6 +140,19 @@ internal class AdjustAffiliateService(private val dependencies: Dependencies) : 
                     completion(null)
                 }
             }
+        }
+    }
+
+    // MARK: - Internal Deep Link Handling
+    private fun handleAdjustDeeplink(deepLink: Uri?) {
+        if (deepLink != null) {
+            Logger.logInfo("Received Adjust deeplink: $deepLink")
+            // Call the internal appWillOpen method without a completion
+            dependencies.tappInstance?.appWillOpen(deepLink.toString(), null) ?: run {
+                Logger.logError("Tapp instance is not available to handle deeplink.")
+            }
+        } else {
+            Logger.logWarning("Received null deeplink from Adjust.")
         }
     }
 
