@@ -35,29 +35,28 @@ internal class AdjustAffiliateService(private val dependencies: Dependencies) : 
 
             val adjustEnvironment = when (config.env) {
                 Environment.PRODUCTION -> AdjustConfig.ENVIRONMENT_PRODUCTION
-                Environment.SANDBOX-> AdjustConfig.ENVIRONMENT_SANDBOX
+                Environment.SANDBOX    -> AdjustConfig.ENVIRONMENT_SANDBOX
             }
-
 
             val adjustConfig = AdjustConfig(context, config.appToken, adjustEnvironment)
             adjustConfig.setLogLevel(LogLevel.VERBOSE)
-            Adjust.initSdk(adjustConfig)
-            Logger.logInfo("Adjust initialized")
 
-            // Register Deeplink Listener
+            // Move this *before* initSdk
             adjustConfig.setOnDeferredDeeplinkResponseListener { deeplink ->
                 handleAdjustDeeplink(deeplink)
                 // Returning false indicates that the deeplink is not consumed and should be processed further
                 false
             }
 
-            Logger.logInfo("Adjust deeplink listener registered")
+            Adjust.initSdk(adjustConfig)
+            Logger.logInfo("Adjust initialized and deeplink listener registered")
             true
         } catch (e: Exception) {
             Logger.logWarning("Error during Adjust referral processing: ${e.message}")
             false
         }
     }
+
 
 
     override fun handleCallback(deepLink: Uri) {
