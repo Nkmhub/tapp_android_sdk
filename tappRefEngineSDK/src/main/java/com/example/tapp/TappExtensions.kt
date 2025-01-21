@@ -11,9 +11,33 @@ import com.example.tapp.utils.VoidCompletion
 
 
 internal fun Tapp.appWillOpen(url: Uri, completion: VoidCompletion?) {
+    val config = dependencies.keystoreUtils.getConfig()
+    if (config == null) {
+        // No config -> cannot proceed
+        completion?.invoke(Result.failure(TappError.MissingConfiguration()))
+        return
+    }
+
+    // Check if we already have secrets and the service is enabled
+    val service = dependencies.affiliateServiceFactory
+        .getAffiliateService(config.affiliate, dependencies)
+
+    val hasSecrets = config.appToken != null
+    val isServiceEnabled = service?.isEnabled() == true
+
+    // If we ALREADY have secrets + the service is enabled,
+    // skip re-fetching secrets or re-initializing,
+    // and go straight to handleReferralCallback:
+    if (hasSecrets && isServiceEnabled) {
+        handleReferralCallback(url, completion)
+        return
+    }
+
+    // Otherwise, secrets or init are still needed:
     fetchSecretsAndInitializeReferralEngineIfNeeded { result ->
         result.fold(
             onSuccess = {
+                // Now that secrets & init are done, handle the callback
                 handleReferralCallback(url, completion)
             },
             onFailure = { error ->
@@ -22,6 +46,7 @@ internal fun Tapp.appWillOpen(url: Uri, completion: VoidCompletion?) {
         )
     }
 }
+
 
 internal fun Tapp.handleReferralCallback(
     url: Uri,
