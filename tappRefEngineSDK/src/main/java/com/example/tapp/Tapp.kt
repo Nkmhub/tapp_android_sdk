@@ -84,8 +84,6 @@ class Tapp(context: Context) {
         }
     }
 
-
-
     internal fun appWillOpen(url: String?, completion: VoidCompletion?) {
 
         if (url.isNullOrEmpty()) {
@@ -113,6 +111,18 @@ class Tapp(context: Context) {
         appWillOpen(parsedUri, completion)
     }
 
+    fun appWillOpenIntent(url: String?){
+        Logger.logInfo("!@#$ Intent START")
+        Logger.logInfo("URL: ${url}")
+        Logger.logInfo("!@#$ Intent END")
+    }
+
+    fun appWillOpenInstallReferrerStateListener(url: String?){
+        Logger.logInfo("!@#$ InstallReferrerStateListener START")
+        Logger.logInfo("URL: ${url}")
+        Logger.logInfo("!@#$ InstallReferrerStateListener END")
+    }
+
     fun logConfig() {
         // Retrieve the stored configuration
         val storedConfig = dependencies.keystoreUtils.getConfig()
@@ -133,7 +143,6 @@ class Tapp(context: Context) {
         Logger.logInfo("App Token: ${storedConfig.appToken ?: "Not Set"}")
         Logger.logInfo("Referral Engine Processed: ${storedConfig.hasProcessedReferralEngine}")
     }
-
 
     suspend fun url(
         influencer: String,
