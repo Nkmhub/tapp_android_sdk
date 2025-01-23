@@ -102,22 +102,37 @@ internal fun Tapp.handleReferralCallback(
 
 }
 
-internal fun Tapp.fetchSecretsAndInitializeReferralEngineIfNeeded(completion: VoidCompletion?) {
+internal fun Tapp.fetchSecretsAndInitializeReferralEngineIfNeeded(
+    completion: (Result<Unit>) -> Unit
+) {
     val config = dependencies.keystoreUtils.getConfig()
     if (config == null) {
-        completion?.invoke(Result.failure(TappError.MissingConfiguration()))
+        completion(Result.failure(TappError.MissingConfiguration()))
         return
     }
 
-    secrets() { result: Result<Unit> ->
-        result.fold(
+    // If we already have an appToken and service is enabled, skip
+    val hasSecrets = (config.appToken != null)
+    val service = dependencies.affiliateServiceFactory
+        .getAffiliateService(config.affiliate, dependencies)
+    val isEnabled = service?.isEnabled() == true
+
+    if (hasSecrets && isEnabled) {
+        completion(Result.success(Unit))
+        return
+    }
+
+    // Otherwise fetch secrets
+    secrets { secretResult ->
+        secretResult.fold(
             onSuccess = {
-                initializeAffiliateService(completion)
+                // then init
+                initializeAffiliateService { initResult ->
+                    completion(initResult)
+                }
             },
             onFailure = { error ->
-                completion?.invoke(
-                    Result.failure(TappError.affiliateErrorResult(error, config.affiliate))
-                )
+                completion(Result.failure(error))
             }
         )
     }
