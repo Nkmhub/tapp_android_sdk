@@ -40,8 +40,8 @@ internal class AdjustAffiliateService(private val dependencies: Dependencies) : 
 
             val adjustConfig = AdjustConfig(context, config.appToken, adjustEnvironment)
             adjustConfig.setLogLevel(LogLevel.VERBOSE)
+            println(adjustConfig);
 
-            // Move this *before* initSdk
             adjustConfig.setOnDeferredDeeplinkResponseListener { deeplink ->
                 handleAdjustDeeplink(deeplink)
                 // Returning false indicates that the deeplink is not consumed and should be processed further
