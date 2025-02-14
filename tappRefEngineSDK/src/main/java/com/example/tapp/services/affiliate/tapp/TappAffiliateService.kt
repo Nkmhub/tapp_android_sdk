@@ -184,39 +184,20 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
         }
     }
 
-    suspend fun callLinkDataService(url: Uri,isFirstSession: Boolean? = null): RequestModels.TappLinkDataResponse {
-        val config = dependencies.keystoreUtils.getConfig() ?: return RequestModels.TappLinkDataResponse(
-            error = true,
-            message = "Missing configuration",
-            tappUrl = null,
-            attrTappUrl = null,
-            influencer = null,
-            data = null,
-            isFirstSession = false
-        )
+    suspend fun callLinkDataService(url: Uri, isFirstSession: Boolean? = null): RequestModels.TappLinkDataResponse {
+        val config = dependencies.keystoreUtils.getConfig()
+            ?: return RequestModels.errorTappLinkDataResponse("Missing configuration")
 
         val linkToken = url.linkToken(config.affiliate)
-            ?: return RequestModels.TappLinkDataResponse(
-                error = true,
-                message = "Link token not found in URL",
-                tappUrl = null,
-                attrTappUrl = null,
-                influencer = null,
-                data = null,
-                isFirstSession = false
-            )
+            ?: return RequestModels.errorTappLinkDataResponse("Link token not found in URL")
 
-        val fetchDataRequest = RequestModels.TappLinkDataRequest(
-            linkToken = linkToken
-        )
-
-        val endpoint = TappEndpoint.fetchLinkData(dependencies,fetchDataRequest)
+        val fetchDataRequest = RequestModels.TappLinkDataRequest(linkToken = linkToken)
+        val endpoint = TappEndpoint.fetchLinkData(dependencies, fetchDataRequest)
 
         return try {
             val result = dependencies.networkManager.postRequest(endpoint.url, endpoint.body, endpoint.headers)
             result.fold(
                 onSuccess = { jsonResponse ->
-
                     val dataMap: Map<String, String> = jsonResponse.optJSONObject("data")?.let { json ->
                         val map = mutableMapOf<String, String>()
                         val keys = json.keys()
@@ -237,33 +218,15 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
                         data = dataMap,
                         isFirstSession = finalIsFirstSession
                     )
-
                 },
                 onFailure = { exception ->
-                    RequestModels.TappLinkDataResponse(
-                        error = true,
-                        message = "Failed to parse response: ${exception.localizedMessage}",
-                        tappUrl = null,
-                        attrTappUrl = null,
-                        influencer = null,
-                        data = null,
-                        isFirstSession = false
-                    )
+                    RequestModels.errorTappLinkDataResponse("Failed to parse response: ${exception.localizedMessage}")
                 }
             )
         } catch (e: Exception) {
-            RequestModels.TappLinkDataResponse(
-                error = true,
-                message = "Failed to parse response: ${e.localizedMessage}",
-                tappUrl = null,
-                attrTappUrl = null,
-                influencer = null,
-                data = null,
-                isFirstSession = false
-            )
+            RequestModels.errorTappLinkDataResponse("Failed to parse response: ${e.localizedMessage}")
         }
     }
-
 
     private fun parseSecretsResponse(response: JSONObject): RequestModels.SecretsResponse {
         // Extract the "secret" field from the JSON response

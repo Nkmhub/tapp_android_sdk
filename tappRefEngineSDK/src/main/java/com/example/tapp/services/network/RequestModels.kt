@@ -158,6 +158,21 @@ class RequestModels {
         val isFirstSession: Boolean?
     )
 
+    companion object {
+        fun errorTappLinkDataResponse(message: String): TappLinkDataResponse {
+            return TappLinkDataResponse(
+                error = true,
+                message = message,
+                tappUrl = null,
+                attrTappUrl = null,
+                influencer = null,
+                data = null,
+                isFirstSession = false
+            )
+        }
+    }
+
+
 //    "tapp_url": "https://w2wv.nkmhub.com/1cef4f5c-05ec-4dde-ae77-6cddb996fb3e",
 //    "attr_tapp_url": "https://w2wv.nkmhub.com/1cef4f5c-05ec-4dde-ae77-6cddb996fb3e?last_suggestion=47%20Ronin&",
 //    "influencer": "1cef4f5c-05ec-4dde-ae77-6cddb996fb3e",

@@ -266,44 +266,19 @@ class Tapp(context: Context) {
 
     suspend fun fetchLinkData(url: String): RequestModels.TappLinkDataResponse? =
         withContext(Dispatchers.IO) {
-            val uri = Uri.parse(url);
-            val config = dependencies.keystoreUtils.getConfig() ?: return@withContext RequestModels.TappLinkDataResponse(
-                error = true,
-                message = "Missing configuration",
-                tappUrl = null,
-                attrTappUrl = null,
-                influencer = null,
-                data = null,
-                isFirstSession = false
-            )
+            val uri = Uri.parse(url)
+            val config = dependencies.keystoreUtils.getConfig()
+                ?: return@withContext RequestModels.errorTappLinkDataResponse("Missing configuration")
 
             if (!shouldProcess(url)) {
-                return@withContext RequestModels.TappLinkDataResponse(
-                    error = true,
-                    message = "URL is not processable",
-                    tappUrl = null,
-                    attrTappUrl = null,
-                    influencer = null,
-                    data = null,
-                    isFirstSession = false
-                )
+                return@withContext RequestModels.errorTappLinkDataResponse("URL is not processable")
             }
 
             try {
-
                 val hasSecrets = config.appToken != null
-
                 val tappService = dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)
                 if (tappService !is TappAffiliateService) {
-                    return@withContext RequestModels.TappLinkDataResponse(
-                        error = true,
-                        message = "Tapp service not available",
-                        tappUrl = null,
-                        attrTappUrl = null,
-                        influencer = null,
-                        data = null,
-                        isFirstSession = false
-                    )
+                    return@withContext RequestModels.errorTappLinkDataResponse("Tapp service not available")
                 }
 
                 if (hasSecrets) {
@@ -318,27 +293,11 @@ class Tapp(context: Context) {
                         tappService.callLinkDataService(uri)
                     } else {
                         val error = secretsResult.exceptionOrNull()
-                        RequestModels.TappLinkDataResponse(
-                            error = true,
-                            message = error?.message ?: "Unknown error",
-                            tappUrl = null,
-                            attrTappUrl = null,
-                            influencer = null,
-                            data = null,
-                            isFirstSession = false
-                        )
+                        RequestModels.errorTappLinkDataResponse(error?.message ?: "Unknown error")
                     }
                 }
             } catch (e: Exception) {
-                return@withContext RequestModels.TappLinkDataResponse(
-                    error = true,
-                    message = "Failed to parse response: ${e.localizedMessage}",
-                    tappUrl = null,
-                    attrTappUrl = null,
-                    influencer = null,
-                    data = null,
-                    isFirstSession = false
-                )
+                return@withContext RequestModels.errorTappLinkDataResponse("Failed to parse response: ${e.localizedMessage}")
             }
         }
 }
