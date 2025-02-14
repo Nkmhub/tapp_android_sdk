@@ -15,7 +15,8 @@ internal data class InternalConfiguration(
     var appToken: String? = null,
     @Required var hasProcessedReferralEngine: Boolean = false,
     val androidId: String,
-    var deepLinkUrl: String? = null
+    var deepLinkUrl: String? = null,
+    var linkToken: String? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -28,7 +29,8 @@ internal data class InternalConfiguration(
                 bundleID == other.bundleID &&
                 appToken == other.appToken &&
                 androidId == other.androidId &&
-                deepLinkUrl == other.deepLinkUrl
+                deepLinkUrl == other.deepLinkUrl &&
+                linkToken == other.linkToken
     }
 
 
@@ -42,6 +44,7 @@ internal data class InternalConfiguration(
         result = 31 * result + (appToken?.hashCode() ?: 0)
         result = 31 * result + androidId.hashCode()
         result = 31 * result + (deepLinkUrl?.hashCode() ?: 0)
+        result = 31 * result + (linkToken?.hashCode() ?: 0)
         return result
     }
 

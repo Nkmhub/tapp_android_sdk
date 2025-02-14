@@ -58,7 +58,6 @@ internal class AdjustAffiliateService(private val dependencies: Dependencies) : 
     }
 
 
-
     override fun handleCallback(deepLink: Uri) {
         val context = dependencies.context
         val url = AdjustDeeplink(deepLink)
@@ -147,7 +146,7 @@ internal class AdjustAffiliateService(private val dependencies: Dependencies) : 
         if (deepLink != null) {
             Logger.logInfo("Received Adjust deeplink: $deepLink")
             // Call the internal appWillOpen method without a completion
-            dependencies.tappInstance?.appWillOpen(deepLink.toString(), null) ?: run {
+            dependencies.tappInstance?.appWillOpenInt(deepLink.toString(), null) ?: run {
                 Logger.logError("Tapp instance is not available to handle deeplink.")
             }
         } else {
