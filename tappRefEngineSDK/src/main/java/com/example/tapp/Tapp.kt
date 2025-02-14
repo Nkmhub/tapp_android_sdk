@@ -17,6 +17,8 @@ import kotlinx.coroutines.withContext
 import android.provider.Settings
 import com.example.tapp.utils.InternalConfiguration
 import java.net.URL
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class Tapp(context: Context) {
 
@@ -261,5 +263,81 @@ class Tapp(context: Context) {
         }
     }
 
+    suspend fun fetchLinkData(url: URL): RequestModels.TappLinkDataResponse? =
+        withContext(Dispatchers.IO) {
 
+            val config = dependencies.keystoreUtils.getConfig() ?: return@withContext RequestModels.TappLinkDataResponse(
+                error = true,
+                message = "Missing configuration",
+                tappUrl = null,
+                attrTappUrl = null,
+                influencer = null,
+                data = null,
+                isFirstSession = false
+            )
+
+            if (!shouldProcess(url)) {
+                return@withContext RequestModels.TappLinkDataResponse(
+                    error = true,
+                    message = "URL is not processable",
+                    tappUrl = null,
+                    attrTappUrl = null,
+                    influencer = null,
+                    data = null,
+                    isFirstSession = false
+                )
+            }
+
+            try {
+
+                val hasSecrets = config.appToken != null
+
+                val tappService = dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)
+                if (tappService !is TappAffiliateService) {
+                    return@withContext RequestModels.TappLinkDataResponse(
+                        error = true,
+                        message = "Tapp service not available",
+                        tappUrl = null,
+                        attrTappUrl = null,
+                        influencer = null,
+                        data = null,
+                        isFirstSession = false
+                    )
+                }
+
+                if (hasSecrets) {
+                    return@withContext tappService.callLinkDataService(url)
+                } else {
+                    val secretsResult: Result<Unit> = suspendCoroutine { cont ->
+                        fetchSecretsAndInitializeReferralEngineIfNeeded { result ->
+                            cont.resume(result)
+                        }
+                    }
+                    return@withContext if (secretsResult.isSuccess) {
+                        tappService.callLinkDataService(url)
+                    } else {
+                        val error = secretsResult.exceptionOrNull()
+                        RequestModels.TappLinkDataResponse(
+                            error = true,
+                            message = error?.message ?: "Unknown error",
+                            tappUrl = null,
+                            attrTappUrl = null,
+                            influencer = null,
+                            data = null,
+                            isFirstSession = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                return@withContext RequestModels.TappLinkDataResponse(
+                    error = true,
+                    message = "Failed to parse response: ${e.localizedMessage}",
+                    tappUrl = null,
+                    attrTappUrl = null,
+                    influencer = null,
+                    data = null,
+                    isFirstSession = false
+                )
+            }
+        }
 }

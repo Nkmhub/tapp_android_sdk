@@ -69,6 +69,7 @@ internal fun Tapp.handleReferralCallback(
                     dependencies.keystoreUtils.getConfig()?.affiliate ?: Affiliate.TAPP,
                     dependencies
                 )
+                val tappService = dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)
 
                 if (affiliateService == null) {
                     completion?.invoke(Result.failure(TappError.MissingAffiliateService("Affiliate service not available")))
@@ -90,8 +91,8 @@ internal fun Tapp.handleReferralCallback(
                 // Always run these two calls regardless of error state
                 saveDeepLinkUrl(url.toString())
                 saveLinkToken(linkToken)
+                //TODO:: fetchlink data here with true isFirstSession, inside the listener???
                 setProcessedReferralEngine()
-
                 completion?.invoke(Result.success(Unit))
             },
             onFailure = { error ->

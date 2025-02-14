@@ -39,3 +39,11 @@ fun URL.param(key: String): String? {
         ?.firstOrNull { it[0] == key }
         ?.getOrNull(1)
 }
+
+fun URL.linkToken(affiliate: Affiliate): String? {
+    return when (affiliate) {
+        Affiliate.ADJUST -> this.param(AdjustURLParamKey.TOKEN.value)
+        Affiliate.APPFLYER -> this.param(AppsflyerURLParamKey.TOKEN.value)
+        Affiliate.TAPP -> this.param(TappURLParamKey.TOKEN.value)
+    }
+}

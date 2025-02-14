@@ -1,6 +1,7 @@
 package com.example.tapp.services.network
 
 import com.example.tapp.utils.TappConfiguration
+import java.net.URL
 
 class RequestModels {
 
@@ -142,4 +143,26 @@ class RequestModels {
 //            }
     }
 
+
+    data class TappLinkDataRequest(
+        val linkToken: String,
+    )
+
+    data class TappLinkDataResponse(
+        val error: Boolean,
+        val message: String?,
+        val tappUrl:String?,
+        val attrTappUrl:String?,
+        val influencer:String?,
+        val data: Map<String, String>?,
+        val isFirstSession: Boolean?
+    )
+
+//    "tapp_url": "https://w2wv.nkmhub.com/1cef4f5c-05ec-4dde-ae77-6cddb996fb3e",
+//    "attr_tapp_url": "https://w2wv.nkmhub.com/1cef4f5c-05ec-4dde-ae77-6cddb996fb3e?last_suggestion=47%20Ronin&",
+//    "influencer": "1cef4f5c-05ec-4dde-ae77-6cddb996fb3e",
+//    "data": {
+//        "last_suggestion": "47 Ronin",
+//        "test": null
+//    }
 }

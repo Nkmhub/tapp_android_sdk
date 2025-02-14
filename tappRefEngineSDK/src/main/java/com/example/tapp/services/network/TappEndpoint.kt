@@ -83,6 +83,26 @@ internal object TappEndpoint {
         return RequestModels.Endpoint(url, headers, body)
     }
 
+    fun fetchLinkData(dependencies: Dependencies,request: RequestModels.TappLinkDataRequest):  RequestModels.Endpoint  {
+        val config = dependencies.keystoreUtils.getConfig()
+            ?: throw TappError.MissingConfiguration("Configuration is missing")
+
+        val url = "${getBaseUrl(config.env.environmentName())}linkData"
+
+        val headers = mapOf(
+            "Authorization" to "Bearer ${config.authToken}",
+            "Content-Type" to "application/json"
+        )
+
+        val body = mapOf(
+            "tapp_token" to config.tappToken,
+            "bundle_id" to (config.bundleID?:""),
+            "link_token" to request.linkToken,
+        )
+
+        return RequestModels.Endpoint(url, headers, body)
+    }
+
     fun tappEvent(
         dependencies: Dependencies,
         eventRequest: RequestModels.TappEvent
