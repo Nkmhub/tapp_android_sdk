@@ -81,8 +81,15 @@ internal fun Tapp.handleReferralCallback(
                     affiliateService.handleCallback(url)
                 }
 
+                // Extract a specific parameter from the URL before saving the deep link URL
+                val linkToken = url.getQueryParameter("adj_t")
+                if (linkToken != null) {
+                    Logger.logInfo("Extracted linkToken: $linkToken")
+                }
+
                 // Always run these two calls regardless of error state
                 saveDeepLinkUrl(url.toString())
+                saveLinkToken(linkToken)
                 setProcessedReferralEngine()
 
                 completion?.invoke(Result.success(Unit))
@@ -225,6 +232,23 @@ internal fun Tapp.saveDeepLinkUrl(deepLinkUrl: String?) {
         Logger.logInfo("Deep link URL saved: $deepLinkUrl")
     } else {
         Logger.logError("Failed to save deep link URL: configuration is null")
+    }
+}
+
+internal fun Tapp.saveLinkToken(linkToken: String?) {
+    if (linkToken.isNullOrBlank()) {
+        Logger.logWarning("Cannot save linkToken: linkToken is null or blank")
+        return
+    }
+
+    Logger.logInfo("Saving linkToken: $linkToken")
+    val config = dependencies.keystoreUtils.getConfig()
+    if (config != null) {
+        val updatedConfig = config.copy(linkToken = linkToken)
+        dependencies.keystoreUtils.saveConfig(updatedConfig)
+        Logger.logInfo("linkToken saved: $linkToken")
+    } else {
+        Logger.logError("Failed to save linkToken: configuration is null")
     }
 }
 

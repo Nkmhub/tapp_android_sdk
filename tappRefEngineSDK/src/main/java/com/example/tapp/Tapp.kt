@@ -57,7 +57,7 @@ class Tapp(context: Context) {
                 tappToken = config.tappToken,
                 affiliate = config.affiliate,
                 bundleID = bundleID,
-                androidId = androidId
+                androidId = androidId,
             )
         }
 
@@ -84,7 +84,34 @@ class Tapp(context: Context) {
         }
     }
 
-    internal fun appWillOpen(url: String?, completion: VoidCompletion?) {
+    internal fun appWillOpenInt(url: String?, completion: VoidCompletion?) {
+        Logger.logInfo("AppWillOpenInt start running")
+        if (url.isNullOrEmpty()) {
+            Logger.logInfo("No URL provided. Skipping appWillOpen processing.")
+            completion?.invoke(Result.success(Unit))
+            return
+        }
+
+        // Step 1: Check if the referral engine is already processed
+        if (hasProcessedReferralEngine()) {
+            Logger.logInfo("Referral engine already processed. Returning early.")
+            completion?.invoke(Result.success(Unit)) // Optionally signal success without processing
+            return
+        }
+
+        val parsedUri = Uri.parse(url)
+        // Step 2: Get the configuration
+        val config = dependencies.keystoreUtils.getConfig()
+        if (config == null) {
+            completion?.invoke(Result.failure(TappError.MissingConfiguration()))
+            return
+        }
+
+        // Step 3: Continue to the next logic
+        appWillOpen(parsedUri, completion)
+    }
+
+    fun appWillOpen(url: String?, completion: VoidCompletion?) {
 
         if (url.isNullOrEmpty()) {
             Logger.logInfo("No URL provided. Skipping appWillOpen processing.")
