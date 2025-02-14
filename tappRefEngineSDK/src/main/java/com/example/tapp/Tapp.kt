@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.provider.Settings
 import com.example.tapp.utils.InternalConfiguration
+import java.net.URL
 
 class Tapp(context: Context) {
 
@@ -169,6 +170,19 @@ class Tapp(context: Context) {
         Logger.logInfo("Android ID: ${storedConfig.androidId ?: "Not Set"}")
         Logger.logInfo("App Token: ${storedConfig.appToken ?: "Not Set"}")
         Logger.logInfo("Referral Engine Processed: ${storedConfig.hasProcessedReferralEngine}")
+    }
+
+    fun shouldProcess(url: URL?):Boolean {
+        if(url == null) return false
+        Logger.logInfo("ShouldProcess() started!")
+        Logger.logError("ShouldProcess(): url is null")
+        val tappService =
+            dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)
+        if (tappService !is TappAffiliateService) {
+            Logger.logError("TappService: is null")
+            return false
+        }
+        return tappService.shouldProcess(url);
     }
 
     suspend fun url(

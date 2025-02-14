@@ -2,18 +2,22 @@ package com.example.tapp.services.affiliate.tapp
 
 import android.net.Uri
 import com.example.tapp.dependencies.Dependencies
+import com.example.tapp.models.AdjustURLParamKey
 import com.example.tapp.models.Affiliate
+import com.example.tapp.models.AppsflyerURLParamKey
+import com.example.tapp.models.TappURLParamKey
+import com.example.tapp.models.param
 import com.example.tapp.services.affiliate.AffiliateService
 import com.example.tapp.services.network.RequestModels
 import com.example.tapp.services.network.TappEndpoint
 import com.example.tapp.services.network.TappError
 import com.example.tapp.utils.Logger
-import com.example.tapp.utils.VoidCompletion
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.net.URL
 
 internal class TappAffiliateService(private val dependencies: Dependencies) : AffiliateService {
     private var isTapEnabled: Boolean = false
@@ -86,7 +90,6 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
         }
     }
 
-
     fun fetchSecrets(completion: (Result<RequestModels.SecretsResponse>) -> Unit) {
         dependencies.keystoreUtils.getConfig()
             ?: return completion(Result.failure(TappError.MissingConfiguration("Missing configuration")))
@@ -136,8 +139,6 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
         }
     }
 
-
-
     suspend fun trackEvent(tappEventRequest: RequestModels.TappEvent): Result<Unit> {
         val endpoint = TappEndpoint.tappEvent(dependencies, tappEventRequest)
 
@@ -171,6 +172,16 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
         }
     }
 
+    fun shouldProcess(url: URL): Boolean {
+        val config = dependencies.keystoreUtils.getConfig() ?: return false
+        Logger.logError("Affiliate is missing")
+
+        return when (config.affiliate) {
+            Affiliate.ADJUST -> url.param(AdjustURLParamKey.TOKEN.value) != null
+            Affiliate.APPFLYER -> url.param(AppsflyerURLParamKey.TOKEN.value) != null
+            Affiliate.TAPP -> url.param(TappURLParamKey.TOKEN.value) != null
+        }
+    }
 
     private fun parseSecretsResponse(response: JSONObject): RequestModels.SecretsResponse {
         // Extract the "secret" field from the JSON response
@@ -187,7 +198,5 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
             message = jsonObject.optString("message", ""),
         )
     }
-
-
 
 }
