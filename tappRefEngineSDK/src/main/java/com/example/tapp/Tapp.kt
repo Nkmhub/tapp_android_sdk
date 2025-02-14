@@ -174,7 +174,7 @@ class Tapp(context: Context) {
         Logger.logInfo("Referral Engine Processed: ${storedConfig.hasProcessedReferralEngine}")
     }
 
-    fun shouldProcess(url: URL?):Boolean {
+    fun shouldProcess(url: String?):Boolean {
         if(url == null) return false
         Logger.logInfo("ShouldProcess() started!")
         Logger.logError("ShouldProcess(): url is null")
@@ -184,7 +184,8 @@ class Tapp(context: Context) {
             Logger.logError("TappService: is null")
             return false
         }
-        return tappService.shouldProcess(url);
+        val uri = Uri.parse(url)
+        return tappService.shouldProcess(uri);
     }
 
     suspend fun url(
@@ -263,9 +264,9 @@ class Tapp(context: Context) {
         }
     }
 
-    suspend fun fetchLinkData(url: URL): RequestModels.TappLinkDataResponse? =
+    suspend fun fetchLinkData(url: String): RequestModels.TappLinkDataResponse? =
         withContext(Dispatchers.IO) {
-
+            val uri = Uri.parse(url);
             val config = dependencies.keystoreUtils.getConfig() ?: return@withContext RequestModels.TappLinkDataResponse(
                 error = true,
                 message = "Missing configuration",
@@ -306,7 +307,7 @@ class Tapp(context: Context) {
                 }
 
                 if (hasSecrets) {
-                    return@withContext tappService.callLinkDataService(url)
+                    return@withContext tappService.callLinkDataService(uri)
                 } else {
                     val secretsResult: Result<Unit> = suspendCoroutine { cont ->
                         fetchSecretsAndInitializeReferralEngineIfNeeded { result ->
@@ -314,7 +315,7 @@ class Tapp(context: Context) {
                         }
                     }
                     return@withContext if (secretsResult.isSuccess) {
-                        tappService.callLinkDataService(url)
+                        tappService.callLinkDataService(uri)
                     } else {
                         val error = secretsResult.exceptionOrNull()
                         RequestModels.TappLinkDataResponse(

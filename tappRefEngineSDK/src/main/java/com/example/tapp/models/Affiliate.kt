@@ -1,5 +1,6 @@
 package com.example.tapp.models
 
+import android.net.Uri
 import kotlinx.serialization.Serializable
 import java.net.URL
 
@@ -32,7 +33,7 @@ enum class TappURLParamKey(val value: String) {
 }
 
 // Extension function to extract a query parameter from a URL.
-fun URL.param(key: String): String? {
+fun Uri.param(key: String): String? {
     return this.query
         ?.split("&")
         ?.map { it.split("=") }
@@ -40,7 +41,7 @@ fun URL.param(key: String): String? {
         ?.getOrNull(1)
 }
 
-fun URL.linkToken(affiliate: Affiliate): String? {
+fun Uri.linkToken(affiliate: Affiliate): String? {
     return when (affiliate) {
         Affiliate.ADJUST -> this.param(AdjustURLParamKey.TOKEN.value)
         Affiliate.APPFLYER -> this.param(AppsflyerURLParamKey.TOKEN.value)

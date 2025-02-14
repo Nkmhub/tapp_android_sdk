@@ -173,7 +173,7 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
         }
     }
 
-    fun shouldProcess(url: URL): Boolean {
+    fun shouldProcess(url: Uri): Boolean {
         val config = dependencies.keystoreUtils.getConfig() ?: return false
         Logger.logError("Affiliate is missing")
 
@@ -184,7 +184,7 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
         }
     }
 
-    suspend fun callLinkDataService(url: URL,isFirstSession: Boolean? = null): RequestModels.TappLinkDataResponse {
+    suspend fun callLinkDataService(url: Uri,isFirstSession: Boolean? = null): RequestModels.TappLinkDataResponse {
         val config = dependencies.keystoreUtils.getConfig() ?: return RequestModels.TappLinkDataResponse(
             error = true,
             message = "Missing configuration",
