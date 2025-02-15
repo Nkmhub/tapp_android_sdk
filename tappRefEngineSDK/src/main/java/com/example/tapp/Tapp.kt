@@ -312,7 +312,9 @@ class Tapp(context: Context) {
 
     fun handleTesListener(test: String) {
         // Optionally, perform additional processing before notifying the listener
+        Logger.logInfo("#############################")
         Logger.logInfo("handleTesListener response: $test")
+        Logger.logInfo("#############################")
         deferredLinkDelegate?.testListener(test);
     }
 
