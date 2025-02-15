@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.provider.Settings
+import com.example.tapp.services.affiliate.tapp.DeferredLinkDelegate
 import com.example.tapp.utils.InternalConfiguration
 import java.net.URL
 import kotlin.coroutines.resume
@@ -25,6 +26,8 @@ class Tapp(context: Context) {
     internal val dependencies = Dependencies.live(context).apply {
         tappInstance = this@Tapp
     }
+
+    var deferredLinkDelegate: DeferredLinkDelegate? = null
 
     fun start(config: TappConfiguration) {
         Logger.logInfo("Start config")
@@ -300,4 +303,27 @@ class Tapp(context: Context) {
                 return@withContext RequestModels.errorTappLinkDataResponse("Failed to parse response: ${e.localizedMessage}")
             }
         }
+
+    fun handleDeferredDeepLink(response: RequestModels.TappLinkDataResponse) {
+        // Optionally, perform additional processing before notifying the listener
+        Logger.logInfo("HandleDeferredDeepLink response: $response")
+        deferredLinkDelegate?.didReceiveDeferredLink(response)
+    }
+
+    fun handleTesListener(test: String) {
+        // Optionally, perform additional processing before notifying the listener
+        Logger.logInfo("handleTesListener response: $test")
+        deferredLinkDelegate?.testListener(test);
+    }
+
+    fun simulateTestEvent() {
+        // Launch a coroutine that waits for 5 seconds before triggering the test event.
+        CoroutineScope(Dispatchers.IO).launch {
+            kotlinx.coroutines.delay(5000L) // delay of 5 seconds
+            withContext(Dispatchers.Main) {
+                handleTesListener("Simulated test event from SDK")
+            }
+        }
+    }
+
 }
