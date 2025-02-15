@@ -8,6 +8,10 @@ import com.example.tapp.services.network.TappError
 import com.example.tapp.utils.Logger
 import com.example.tapp.utils.TappConfiguration
 import com.example.tapp.utils.VoidCompletion
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 internal fun Tapp.appWillOpen(url: Uri, completion: VoidCompletion?) {
@@ -52,7 +56,7 @@ internal fun Tapp.handleReferralCallback(
     url: Uri,
     completion: VoidCompletion?
 ) {
-    // Step 1: Use Tapp service for handleImpression
+    // Step 1: Get Tapp service instance
     val tappService =
         dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)
     if (tappService !is TappAffiliateService) {
@@ -60,54 +64,40 @@ internal fun Tapp.handleReferralCallback(
         return
     }
 
+    // Step 2: Handle impression (for attribution purposes)
     tappService.handleImpression(url) { result ->
         result.fold(
             onSuccess = { tappUrlResponse ->
-                Logger.logInfo("start handleImpression with result: $tappUrlResponse")
+                Logger.logInfo("handleImpression success: $tappUrlResponse")
 
-                val affiliateService = dependencies.affiliateServiceFactory.getAffiliateService(
-                    dependencies.keystoreUtils.getConfig()?.affiliate ?: Affiliate.TAPP,
-                    dependencies
-                )
-                val tappService = dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)
-
-                if (affiliateService == null) {
-                    completion?.invoke(Result.failure(TappError.MissingAffiliateService("Affiliate service not available")))
-                    return@fold
-                }
-
-                // Check if error is true before calling handleCallback
-                if (!tappUrlResponse.error) {
-                    // Only call handleCallback if error == false
-                    affiliateService.handleCallback(url)
-                }
-
-                // Extract a specific parameter from the URL before saving the deep link URL
+                // (Optional) Extract parameters from the URL
                 val linkToken = url.getQueryParameter("adj_t")
                 if (linkToken != null) {
                     Logger.logInfo("Extracted linkToken: $linkToken")
                 }
 
-                // Always run these two calls regardless of error state
+                // Save the deep link URL and link token in configuration
                 saveDeepLinkUrl(url.toString())
                 saveLinkToken(linkToken)
-                //TODO:: fetchlink data here with true isFirstSession, inside the listener???
                 setProcessedReferralEngine()
-                completion?.invoke(Result.success(Unit))
+
+                // Step 3: Now fetch deferred link data with isFirstSession = true
+                // Launch a coroutine because fetchLinkData is suspendable.
+                CoroutineScope(Dispatchers.IO).launch {
+                    val linkDataResponse = tappService.callLinkDataService(url, isFirstSession = true)
+                    withContext(Dispatchers.Main) {
+                        // Notify the delegate with the fetched link data
+                        dependencies.tappInstance?.deferredLinkDelegate?.didReceiveDeferredLink(linkDataResponse)
+                        // Signal that the processing is complete.
+                        completion?.invoke(Result.success(Unit))
+                    }
+                }
             },
             onFailure = { error ->
-                completion?.invoke(
-                    Result.failure(
-                        TappError.affiliateErrorResult(
-                            error,
-                            Affiliate.TAPP
-                        )
-                    )
-                )
+                completion?.invoke(Result.failure(TappError.affiliateErrorResult(error, Affiliate.TAPP)))
             }
         )
     }
-
 }
 
 internal fun Tapp.fetchSecretsAndInitializeReferralEngineIfNeeded(
