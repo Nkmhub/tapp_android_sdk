@@ -158,6 +158,11 @@ class RequestModels {
         val isFirstSession: Boolean?
     )
 
+    data class FailResolvingUrlResponse(
+        val error: String,
+        val url: String
+    )
+
     companion object {
         fun errorTappLinkDataResponse(message: String): TappLinkDataResponse {
             return TappLinkDataResponse(

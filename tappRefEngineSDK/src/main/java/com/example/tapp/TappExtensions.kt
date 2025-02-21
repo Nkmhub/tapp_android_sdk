@@ -94,6 +94,13 @@ internal fun Tapp.handleReferralCallback(
                 }
             },
             onFailure = { error ->
+                dependencies.tappInstance?.deferredLinkDelegate?.didFailResolvingUrl(
+                    response = RequestModels.FailResolvingUrlResponse(
+                        error = error.message ?: "Couldn't resolve the deeplink $url",
+                        url = url.toString()
+                    )
+                )
+
                 completion?.invoke(Result.failure(TappError.affiliateErrorResult(error, Affiliate.TAPP)))
             }
         )
