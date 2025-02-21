@@ -7,7 +7,7 @@ object Logger {
 
     fun init(env: Environment) {
         // Disable logging if the environment is SANDBOX
-        ENABLE_LOGGING = env != Environment.SANDBOX
+        ENABLE_LOGGING = env == Environment.SANDBOX
     }
 
     fun logError(error: String) {
