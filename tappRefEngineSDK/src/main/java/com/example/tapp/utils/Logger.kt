@@ -1,7 +1,14 @@
 package com.example.tapp.utils
 
+import com.example.tapp.models.Environment
+
 object Logger {
-    private const val ENABLE_LOGGING = true // Toggle for enabling/disabling logging
+    private var ENABLE_LOGGING = true
+
+    fun init(env: Environment) {
+        // Disable logging if the environment is SANDBOX
+        ENABLE_LOGGING = env != Environment.SANDBOX
+    }
 
     fun logError(error: String) {
         if (ENABLE_LOGGING) {
