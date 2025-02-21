@@ -304,6 +304,50 @@ class Tapp(context: Context) {
             }
         }
 
+    suspend fun fetchOriginalLinkData(): RequestModels.TappLinkDataResponse? =
+        withContext(Dispatchers.IO) {
+            val config = dependencies.keystoreUtils.getConfig()
+                ?: return@withContext RequestModels.errorTappLinkDataResponse("Missing configuration")
+
+            val url = config.deepLinkUrl;
+
+            if(url.isNullOrEmpty()){
+                return@withContext RequestModels.errorTappLinkDataResponse("URL from config empty")
+            }
+
+            if (!shouldProcess(url)) {
+                return@withContext RequestModels.errorTappLinkDataResponse("URL is not processable")
+            }
+
+            val uri = Uri.parse(url)
+
+            try {
+                val hasSecrets = config.appToken != null
+                val tappService = dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)
+                if (tappService !is TappAffiliateService) {
+                    return@withContext RequestModels.errorTappLinkDataResponse("Tapp service not available")
+                }
+
+                if (hasSecrets) {
+                    return@withContext tappService.callLinkDataService(uri)
+                } else {
+                    val secretsResult: Result<Unit> = suspendCoroutine { cont ->
+                        fetchSecretsAndInitializeReferralEngineIfNeeded { result ->
+                            cont.resume(result)
+                        }
+                    }
+                    return@withContext if (secretsResult.isSuccess) {
+                        tappService.callLinkDataService(uri)
+                    } else {
+                        val error = secretsResult.exceptionOrNull()
+                        RequestModels.errorTappLinkDataResponse(error?.message ?: "Unknown error")
+                    }
+                }
+            } catch (e: Exception) {
+                return@withContext RequestModels.errorTappLinkDataResponse("Failed to parse response: ${e.localizedMessage}")
+            }
+        }
+
     fun handleDeferredDeepLink(response: RequestModels.TappLinkDataResponse) {
         // Optionally, perform additional processing before notifying the listener
         Logger.logInfo("HandleDeferredDeepLink response: $response")
