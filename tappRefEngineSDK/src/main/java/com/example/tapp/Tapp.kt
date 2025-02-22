@@ -114,6 +114,12 @@ class Tapp(context: Context) {
             return
         }
 
+        if (!shouldProcess(url)) {
+            Logger.logInfo("URL is not processable. Skipping processing.")
+            completion?.invoke(Result.success(Unit))
+            return
+        }
+
         // Step 3: Continue to the next logic
         appWillOpen(parsedUri, completion)
     }
@@ -181,7 +187,6 @@ class Tapp(context: Context) {
     fun shouldProcess(url: String?):Boolean {
         if(url == null) return false
         Logger.logInfo("ShouldProcess() started!")
-        Logger.logError("ShouldProcess(): url is null")
         val tappService =
             dependencies.affiliateServiceFactory.getAffiliateService(Affiliate.TAPP, dependencies)
         if (tappService !is TappAffiliateService) {
