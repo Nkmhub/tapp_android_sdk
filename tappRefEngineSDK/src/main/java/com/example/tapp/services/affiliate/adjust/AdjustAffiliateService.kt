@@ -1,8 +1,10 @@
 package com.example.tapp.services.affiliate.adjust
 
+import android.content.Context
 import android.net.Uri
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
+import com.adjust.sdk.AdjustAttribution
 import com.adjust.sdk.AdjustConfig
 import com.adjust.sdk.AdjustDeeplink
 import com.adjust.sdk.AdjustEvent
@@ -18,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 
 internal class AdjustAffiliateService(private val dependencies: Dependencies) : AffiliateService {
     private var isAdjustEnabled: Boolean = false
@@ -117,6 +120,28 @@ internal class AdjustAffiliateService(private val dependencies: Dependencies) : 
             }
             completion(adid)
         }
+    }
+
+    fun gdprForgetMe(context: Context?) {
+        Adjust.gdprForgetMe(context);
+        Logger.logInfo("Adjust gdprForgetMe run")
+    }
+
+    fun trackThirdPartySharing(isEnabled: Boolean) {
+        // Construct the AdjustThirdPartySharing object based on the boolean value.
+        // This is an example. Adjust the implementation as needed.
+        val thirdPartySharing = com.adjust.sdk.AdjustThirdPartySharing(isEnabled)
+        Adjust.trackThirdPartySharing(thirdPartySharing)
+        Logger.logInfo("Adjust trackThirdPartySharing run with isEnabled: $isEnabled")
+    }
+
+
+    fun getAdjustAttribution(completion: (com.adjust.sdk.AdjustAttribution?) -> Unit) {
+        Adjust.getAttribution { attribution ->
+            Logger.logInfo("Attribution received: $attribution")
+            completion(attribution)
+        }
+        Logger.logInfo("Adjust getAttribution run")
     }
 
     fun getAdvertisingId(completion: (String?) -> Unit) {

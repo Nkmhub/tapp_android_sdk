@@ -70,7 +70,7 @@ internal fun Tapp.handleReferralCallback(
             onSuccess = { tappUrlResponse ->
                 Logger.logInfo("handleImpression success: $tappUrlResponse")
 
-                // (Optional) Extract parameters from the URL
+                //TODO:: MAKE IT FOR ALL THE MMPS
                 val linkToken = url.getQueryParameter("adj_t")
                 if (linkToken != null) {
                     Logger.logInfo("Extracted linkToken: $linkToken")

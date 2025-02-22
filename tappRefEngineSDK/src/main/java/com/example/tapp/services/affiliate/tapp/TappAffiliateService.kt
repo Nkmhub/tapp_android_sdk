@@ -175,7 +175,6 @@ internal class TappAffiliateService(private val dependencies: Dependencies) : Af
 
     fun shouldProcess(url: Uri): Boolean {
         val config = dependencies.keystoreUtils.getConfig() ?: return false
-        Logger.logError("Affiliate is missing")
 
         return when (config.affiliate) {
             Affiliate.ADJUST -> url.param(AdjustURLParamKey.TOKEN.value) != null
