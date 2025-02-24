@@ -110,6 +110,12 @@ internal object TappEndpoint {
         val config = dependencies.keystoreUtils.getConfig()
             ?: throw TappError.MissingConfiguration("Configuration is missing")
 
+        val eventNameString = if (eventRequest.eventName.isCustom) {
+            (eventRequest.eventName as RequestModels.EventAction.custom).customValue
+        } else {
+            eventRequest.eventName.toString()
+        }
+
         val url = "${getBaseUrl(config.env.environmentName())}event"
         val headers = mapOf(
             "Content-Type" to "application/json",
@@ -119,9 +125,9 @@ internal object TappEndpoint {
         val body = mapOf(
             "tapp_token" to config.tappToken,
             "bundle_id" to (config.bundleID?:""),
-            "event_name" to eventRequest.eventName,
+            "event_name" to eventNameString,
             "event_url" to (config.deepLinkUrl?:""),
-        ).filterValues { it != null } // Remove null entries
+        ).filterValues { it != null }
 
         return RequestModels.Endpoint(url, headers, body)
     }

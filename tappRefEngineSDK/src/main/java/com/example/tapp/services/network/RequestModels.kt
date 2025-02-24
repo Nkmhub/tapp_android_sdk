@@ -118,7 +118,9 @@ class RequestModels {
         data object tapp_select_content : EventAction(38)
         data object tapp_begin_tutorial : EventAction(39)
         data object tapp_complete_tutorial : EventAction(40)
-        data class custom(val customValue: String) : EventAction(0)
+        data class custom(val customValue: String) : EventAction(0) {
+            override fun toString(): String = customValue
+        }
 
         // Determine if the action is custom
         val isCustom: Boolean
