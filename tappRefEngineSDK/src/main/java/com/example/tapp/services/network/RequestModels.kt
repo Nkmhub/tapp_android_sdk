@@ -78,69 +78,65 @@ class RequestModels {
     )
 
     sealed class EventAction(val rawValue: Int) {
-//        data object Click : EventAction(1)
-//        data object Impression : EventAction(2)
-//        data object Count : EventAction(3)
-        data object TAPP_ADD_PAYMENT_INFO : EventAction(1)
-        data object TAPP_ADD_TO_CART : EventAction(2)
-        data object TAPP_ADD_TO_WISHLIST : EventAction(3)
-        data object TAPP_COMPLETE_REGISTRATION : EventAction(4)
-        data object TAPP_CONTACT : EventAction(5)
-        data object TAPP_CUSTOMIZE_PRODUCT : EventAction(6)
-        data object TAPP_DONATE : EventAction(7)
-        data object TAPP_FIND_LOCATION : EventAction(8)
-        data object TAPP_INITIATE_CHECKOUT : EventAction(9)
-        data object TAPP_GENERATE_LEAD : EventAction(10)
-        data object TAPP_PURCHASE : EventAction(11)
-        data object TAPP_SCHEDULE : EventAction(12)
-        data object TAPP_SEARCH : EventAction(13)
-        data object TAPP_START_TRIAL : EventAction(14)
-        data object TAPP_SUBMIT_APPLICATION : EventAction(15)
-        data object TAPP_SUBSCRIBE : EventAction(16)
-        data object TAPP_VIEW_CONTENT : EventAction(17)
-        data object TAPP_CLICK_BUTTON : EventAction(18)
-        data object TAPP_DOWNLOAD_FILE : EventAction(19)
-        data object TAPP_JOIN_GROUP : EventAction(20)
-        data object TAPP_ACHIEVE_LEVEL : EventAction(21)
-        data object TAPP_CREATE_GROUP : EventAction(22)
-        data object TAPP_CREATE_ROLE : EventAction(23)
-        data object TAPP_LINK_CLICK : EventAction(24)
-        data object TAPP_LINK_IMPRESSION : EventAction(25)
-        data object TAPP_APPLY_FOR_LOAN : EventAction(26)
-        data object TAPP_LOAN_APPROVAL : EventAction(27)
-        data object TAPP_LOAN_DISBURSAL : EventAction(28)
-        data object TAPP_LOGIN : EventAction(29)
-        data object TAPP_RATE : EventAction(30)
-        data object TAPP_SPEND_CREDITS : EventAction(31)
-        data object TAPP_UNLOCK_ACHIEVEMENT : EventAction(32)
-        data object TAPP_ADD_SHIPPING_INFO : EventAction(33)
-        data object TAPP_EARN_VIRTUAL_CURRENCY : EventAction(34)
-        data object TAPP_START_LEVEL : EventAction(35)
-        data object TAPP_COMPLETE_LEVEL : EventAction(36)
-        data object TAPP_POST_SCORE : EventAction(37)
-        data object TAPP_SELECT_CONTENT : EventAction(38)
-        data object TAPP_BEGIN_TUTORIAL : EventAction(39)
-        data object TAPP_COMPLETE_TUTORIAL : EventAction(40)
-
-//        data class Custom(val customValue: String) : EventAction(0)
+        data object tapp_add_payment_info : EventAction(1)
+        data object tapp_add_to_cart : EventAction(2)
+        data object tapp_add_to_wishlist : EventAction(3)
+        data object tapp_complete_registration : EventAction(4)
+        data object tapp_contact : EventAction(5)
+        data object tapp_customize_product : EventAction(6)
+        data object tapp_donate : EventAction(7)
+        data object tapp_find_location : EventAction(8)
+        data object tapp_initiate_checkout : EventAction(9)
+        data object tapp_generate_lead : EventAction(10)
+        data object tapp_purchase : EventAction(11)
+        data object tapp_schedule : EventAction(12)
+        data object tapp_search : EventAction(13)
+        data object tapp_start_trial : EventAction(14)
+        data object tapp_submit_application : EventAction(15)
+        data object tapp_subscribe : EventAction(16)
+        data object tapp_view_content : EventAction(17)
+        data object tapp_click_button : EventAction(18)
+        data object tapp_download_file : EventAction(19)
+        data object tapp_join_group : EventAction(20)
+        data object tapp_achieve_level : EventAction(21)
+        data object tapp_create_group : EventAction(22)
+        data object tapp_create_role : EventAction(23)
+        data object tapp_link_click : EventAction(24)
+        data object tapp_link_impression : EventAction(25)
+        data object tapp_apply_for_loan : EventAction(26)
+        data object tapp_loan_approval : EventAction(27)
+        data object tapp_loan_disbursal : EventAction(28)
+        data object tapp_login : EventAction(29)
+        data object tapp_rate : EventAction(30)
+        data object tapp_spend_credits : EventAction(31)
+        data object tapp_unlock_achievement : EventAction(32)
+        data object tapp_add_shipping_info : EventAction(33)
+        data object tapp_earn_virtual_currency : EventAction(34)
+        data object tapp_start_level : EventAction(35)
+        data object tapp_complete_level : EventAction(36)
+        data object tapp_post_score : EventAction(37)
+        data object tapp_select_content : EventAction(38)
+        data object tapp_begin_tutorial : EventAction(39)
+        data object tapp_complete_tutorial : EventAction(40)
+        data class custom(val customValue: String) : EventAction(0)
 
         // Determine if the action is custom
-//        val isCustom: Boolean
-//            get() = this is Custom
-//
-//        // Check if the action is valid
-//        val isValid: Boolean
-//            get() = when (this) {
-//                is Custom -> customValue.isNotEmpty()
-//                else -> true
-//            }
-//
-//        // Return the custom action string or default "false" for non-custom actions
-//        val eventCustomAction: String
-//            get() = when (this) {
-//                is Custom -> if (customValue.isNotEmpty()) customValue else "false"
-//                else -> "false"
-//            }
+        val isCustom: Boolean
+            get() = this is custom
+
+        // Check if the action is valid
+        val isValid: Boolean
+            get() = when (this) {
+                is custom -> customValue.isNotEmpty()
+                else -> true
+            }
+
+        // Return the custom action string or default "false" for non-custom actions
+        val eventCustomAction: String
+            get() = when (this) {
+                is custom -> customValue.ifEmpty { "false" }
+                else -> "false"
+            }
     }
 
 
