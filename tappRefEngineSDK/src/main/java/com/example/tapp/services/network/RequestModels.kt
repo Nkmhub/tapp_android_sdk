@@ -1,5 +1,8 @@
 package com.example.tapp.services.network
 
+import com.example.tapp.models.Affiliate
+import com.example.tapp.models.Environment
+import com.example.tapp.utils.InternalConfiguration
 import com.example.tapp.utils.TappConfiguration
 import java.net.URL
 
@@ -154,6 +157,23 @@ class RequestModels {
         val influencer:String?,
         val data: Map<String, String>?,
         val isFirstSession: Boolean?
+    )
+
+    data class ExternalConfig(
+        val authToken: String,
+        val env: Environment,
+        val tappToken: String,
+        val affiliate: Affiliate,
+        val bundleID: String,
+        var appToken: String? = null,
+        var deepLinkUrl: String? = null,
+        var linkToken: String? = null
+    )
+
+    data class ConfigResponse(
+        val error: Boolean,
+        val message: String?,
+        val config: ExternalConfig?,
     )
 
     data class FailResolvingUrlResponse(

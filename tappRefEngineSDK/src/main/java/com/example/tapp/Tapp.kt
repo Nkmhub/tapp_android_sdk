@@ -354,6 +354,37 @@ class Tapp(context: Context) {
             }
         }
 
+    fun getConfig(): RequestModels.ConfigResponse {
+        val storedConfig = dependencies.keystoreUtils.getConfig()
+        return if (storedConfig == null) {
+            Logger.logError("Missing configuration")
+            RequestModels.ConfigResponse(
+                error = true,
+                message = "Missing configuration",
+                config = null
+            )
+        } else {
+            // Map the stored configuration to ExternalConfig
+            val externalConfig = RequestModels.ExternalConfig(
+                authToken = storedConfig.authToken,
+                env = storedConfig.env,
+                tappToken = storedConfig.tappToken,
+                affiliate = storedConfig.affiliate,
+                bundleID = storedConfig.bundleID,
+                appToken = storedConfig.appToken,
+                deepLinkUrl = storedConfig.deepLinkUrl,
+                linkToken = storedConfig.linkToken
+            )
+            RequestModels.ConfigResponse(
+                error = false,
+                message = null,
+                config = externalConfig
+            )
+        }
+    }
+
+
+
     fun handleDeferredDeepLink(response: RequestModels.TappLinkDataResponse) {
         deferredLinkDelegate?.didReceiveDeferredLink(response)
     }
