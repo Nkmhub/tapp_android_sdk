@@ -1,6 +1,8 @@
 package com.example.tapp
 
+import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import com.example.tapp.dependencies.Dependencies
 import com.example.tapp.models.Affiliate
@@ -15,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.provider.Settings
+import android.widget.Button
 import com.example.tapp.services.affiliate.tapp.DeferredLinkDelegate
 import com.example.tapp.utils.InternalConfiguration
 import kotlin.coroutines.resume
@@ -392,5 +395,44 @@ class Tapp(context: Context) {
     fun handleDidFailResolvingUrl(response: RequestModels.FailResolvingUrlResponse) {
         deferredLinkDelegate?.didFailResolvingUrl(response)
     }
+
+    //UI ELEMENTS
+    fun tappPayment(
+        buttonText: String = "Show Info",
+        dialogTitle: String = "Environment Information",
+        dialogMessage: String? = null,
+        customizeDialog: (AlertDialog.Builder) -> Unit = {},
+        customizeButton: (Button) -> Unit = {}
+    ): Button {
+        val storedConfig = dependencies.keystoreUtils.getConfig()
+        val envName = storedConfig?.env?.environmentName() ?: "Unknown Environment"
+        return Button(dependencies.context).apply {
+            text = buttonText
+
+            // Default button styling
+            setBackgroundColor(Color.parseColor("#6200EE")) // Example: Material Design purple
+            setTextColor(Color.WHITE)
+            textSize = 16f
+            // Optionally, add padding
+            setPadding(32, 16, 32, 16)
+
+            // Allow developer customization of the button
+            customizeButton(this)
+
+            setOnClickListener {
+                val builder = AlertDialog.Builder(dependencies.context)
+                    .setTitle(dialogTitle)
+                    .setMessage(dialogMessage ?: "Current environment: $envName")
+                    .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+
+                // Developer can further customize the dialog if needed
+                customizeDialog(builder)
+
+                builder.show()
+            }
+        }
+    }
+
+
 
 }
