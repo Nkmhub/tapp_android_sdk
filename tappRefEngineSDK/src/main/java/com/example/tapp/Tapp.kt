@@ -399,7 +399,7 @@ class Tapp(context: Context) {
     //UI ELEMENTS
     private fun tappPayment(
         buttonText: String = "Show Info",
-        dialogTitle: String = "Environment Information",
+        dialogTitle: String = "Environment",
         dialogMessage: String? = null,
         customizeDialog: (AlertDialog.Builder) -> Unit = {},
         customizeButton: (Button) -> Unit = {}
