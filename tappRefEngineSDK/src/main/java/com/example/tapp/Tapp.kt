@@ -397,7 +397,7 @@ class Tapp(context: Context) {
     }
 
     //UI ELEMENTS
-    fun tappPayment(
+    private fun tappPayment(
         buttonText: String = "Show Info",
         dialogTitle: String = "Environment Information",
         dialogMessage: String? = null,
