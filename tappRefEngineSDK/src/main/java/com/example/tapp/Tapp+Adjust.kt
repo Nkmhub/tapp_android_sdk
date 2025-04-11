@@ -98,6 +98,7 @@ fun Tapp.verifyPlayStorePurchase(
 }
 
 fun Tapp.adjustGetGoogleAdId(listener: OnGoogleAdIdReadListener) {
+    Logger.logInfo("run adjustGetGoogleAdId")
     getAdjustService()?.getGoogleAdId(listener)
         ?: Logger.logError("Adjust service not available.")
 }
