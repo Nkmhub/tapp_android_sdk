@@ -103,6 +103,14 @@ internal class AdjustAffiliateService(private val dependencies: Dependencies) : 
         Logger.logInfo("verifyAndTrackPlayStorePurchase called for event: ${event.eventToken}")
     }
 
+    fun verifyPlayStorePurchase(
+        purchase: AdjustPlayStorePurchase,
+        listener: OnPurchaseVerificationFinishedListener
+    ) {
+        Adjust.verifyPlayStorePurchase(purchase, listener)
+        Logger.logInfo("verifyPlayStorePurchase called for productId: ${purchase.productId}")
+    }
+
     // MARK: - Subscriptions
 
     fun trackPlayStoreSubscription(
