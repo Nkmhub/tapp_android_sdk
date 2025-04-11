@@ -2,6 +2,7 @@ package com.example.tapp
 
 import android.content.Context
 import com.adjust.sdk.AdjustEvent
+import com.adjust.sdk.AdjustPlayStorePurchase
 import com.adjust.sdk.AdjustPurchaseVerificationResult
 import com.adjust.sdk.AdjustTestOptions
 import com.adjust.sdk.OnAmazonAdIdReadListener
@@ -85,6 +86,14 @@ fun Tapp.adjustVerifyAndTrackPlayStorePurchase(
     listener: OnPurchaseVerificationFinishedListener
 ) {
     getAdjustService()?.verifyAndTrackPlayStorePurchase(event, listener)
+        ?: Logger.logError("Adjust service not available.")
+}
+
+fun Tapp.verifyPlayStorePurchase(
+    purchase: AdjustPlayStorePurchase,
+    listener: OnPurchaseVerificationFinishedListener
+) {
+    getAdjustService()?.verifyPlayStorePurchase(purchase, listener)
         ?: Logger.logError("Adjust service not available.")
 }
 
