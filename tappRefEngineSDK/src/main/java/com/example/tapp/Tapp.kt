@@ -386,14 +386,28 @@ class Tapp(context: Context) {
         }
     }
 
-
-
     fun handleDeferredDeepLink(response: RequestModels.TappLinkDataResponse) {
         deferredLinkDelegate?.didReceiveDeferredLink(response)
     }
 
     fun handleDidFailResolvingUrl(response: RequestModels.FailResolvingUrlResponse) {
         deferredLinkDelegate?.didFailResolvingUrl(response)
+    }
+
+    fun handleTesListener(test: String) {
+        // Optionally, perform additional processing before notifying the listener
+        Logger.logInfo("handleTesListener response: $test")
+        deferredLinkDelegate?.testListener(test);
+    }
+
+    fun simulateTestEvent() {
+        // Launch a coroutine that waits for 5 seconds before triggering the test event.
+        CoroutineScope(Dispatchers.IO).launch {
+            kotlinx.coroutines.delay(5000L) // delay of 5 seconds
+            withContext(Dispatchers.Main) {
+                handleTesListener("Simulated test event from SDK")
+            }
+        }
     }
 
     //UI ELEMENTS

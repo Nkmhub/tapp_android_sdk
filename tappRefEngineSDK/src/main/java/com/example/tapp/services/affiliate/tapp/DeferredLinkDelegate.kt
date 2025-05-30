@@ -7,4 +7,6 @@ interface DeferredLinkDelegate {
     fun didReceiveDeferredLink(linkDataResponse: RequestModels.TappLinkDataResponse)
 
     fun didFailResolvingUrl(response: RequestModels.FailResolvingUrlResponse)
+
+    fun testListener(test: String);
 }
